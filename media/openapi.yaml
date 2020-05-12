@@ -1,0 +1,1292 @@
+openapi: 3.0.1
+info:
+  title: Apicrud media service
+  version: "0.1"
+  description: |
+    This is the media server for photos/videos and file attachments.
+servers:
+- url: https://media.example.com/api/v1
+- url: http://localhost:8085/api/v1
+- url: http://localhost:32085/api/v1
+
+components:
+  schemas:
+    base: &schema_base
+      properties: &base_endpoints
+        id:
+          type: string
+          minLength: 10
+          maxLength: 10
+        status:
+          description: Status
+          enum:
+          - active
+          - disabled
+          type: string
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          description: status
+          enum:
+          - active
+          - disabled
+          type: string
+      type: object
+    Album:
+      description: A media album
+      properties:
+        id:
+          type: string
+          minLength: 10
+          maxLength: 10
+        name:
+          type: string
+          minLength: 2
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF @_.-]+$
+        sizes:
+          description: Vertical thumbnail sizes to store
+          items:
+            type: integer
+            minimum: 10
+            maximum: 8192
+          type: array
+          default:
+          - 120
+          - 1024
+        encryption:
+          description: Encryption type, default None
+          enum:
+          - aes
+          type: string
+          nullable: true
+        password:
+          description: Encryption passphrase
+          type: string
+          minLength: 8
+          maxLength: 64
+          format: password
+          nullable: true
+        cover_id:
+          description: ID of cover photo
+          $ref: '#/components/schemas/base/properties/id'
+          nullable: true
+        event_id:
+          description: ID of event
+          $ref: '#/components/schemas/base/properties/id'
+          nullable: true
+        list_id:
+          description: ID of list
+          $ref: '#/components/schemas/base/properties/id'
+          nullable: true
+        uid:
+          $ref: '#/components/schemas/base/properties/id'
+        category_id:
+          type: string
+          minLength: 10
+          maxLength: 10
+        privacy:
+          $ref: '#/components/schemas/Storage/properties/privacy'
+          # default: invitee
+        owner:
+          $ref: '#/components/schemas/File/properties/owner'
+          readOnly: true
+      required:
+      - name
+      title: a media album
+      type: object
+      xml:
+        name: Album
+    Health:
+      description: Health check
+      title: status
+      type: object
+    File:
+      <<: *schema_base
+      description: A file
+      example:
+        bucket: attachments
+        name: document.pdf
+        privacy: public
+        size: 3521
+      properties:
+        <<: *base_endpoints
+        name:
+          type: string
+          minLength: 2
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF _.-]+$
+        path:
+          type: string
+          minLength: 2
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF/_.-]+$
+        mime_type:
+          description: Type of file
+          type: string
+          default: text/plain
+          minLength: 2
+          maxLength: 32
+        size:
+          description: Size of the file
+          type: integer
+          minimum: 0
+        sha1:
+          description: Sha1 checksum
+          type: string
+          readOnly: true
+        sha256:
+          description: Sha256 checksum
+          type: string
+          readOnly: true
+        event_id:
+          $ref: '#/components/schemas/base/properties/id'
+          nullable: True
+        storage_id:
+          $ref: '#/components/schemas/base/properties/id'
+        uid:
+          $ref: '#/components/schemas/base/properties/id'
+        privacy:
+          $ref: '#/components/schemas/Storage/properties/privacy'
+          # default: invitee
+        owner:
+          type: string
+          minLength: 4
+          maxLength: 32
+          pattern: ^[a-z0-9@_.-]+$
+          readOnly: true
+      required:
+      - name
+      title: a file
+      type: object
+      xml:
+        name: File
+    FileUploadPresign:
+      description: An upload presigning request
+      properties:
+        storage_id:
+          description: ID of storage volume
+          $ref: '#/components/schemas/base/properties/id'
+        name:
+          description: Name of file to be uploaded
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF _:@#$~+=<>().-]+$
+        duration:
+          description: Duration of video content
+          type: number
+          minimum: 0.0
+          maximum: 7200.0
+          nullable: true
+        height:
+          description: Pixel height of content
+          type: integer
+          minimum: 50
+          maximum: 32768
+          nullable: True
+        size:
+          description: Size of file to be uploaded
+          type: integer
+          minimum: 0
+          maximum: 31457280
+        width:
+          description: Pixel width of content
+          type: integer
+          minimum: 50
+          maximum: 32768
+          nullable: True
+        content_type:
+          description: Content type
+          enum:
+          - binary/octet-stream
+          - image/gif
+          - image/heic
+          - image/jpeg
+          - image/png
+          - image/svg
+          - text/plain
+          - text/html
+          - video/mpeg
+          - video/mp4
+          type: string
+          default: binary/octet-stream
+        parent_type:
+          description: Parent resource type
+          enum:
+          - album
+          - list
+          - message
+          type: string
+          default: album
+        parent_id:
+          description: ID of parent resource
+          $ref: '#/components/schemas/base/properties/id'
+        ttl:
+          description: Expiration time of presigned token
+          type: integer
+          minimum: 10
+          maximum: 259200
+      required:
+      - name
+      - storage_id
+      title: a presigning request
+      type: object
+      xml:
+        name: FileUploadPresign
+    Picture:
+      <<: *schema_base
+      description: A shared picture
+      properties:
+        <<: *base_endpoints
+        name:
+          type: string
+          minLength: 2
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF _.-]+$
+        path:
+          type: string
+          minLength: 2
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF/_.-]+$
+        upload_url:
+          type: string
+          minLength: 2
+          maxLength: 128
+          format: url
+        caption:
+          type: string
+          minLength: 4
+          maxLength: 255
+          nullable: True
+        thumbnail50x50:
+          type: image/*
+          format: binary
+          readOnly: true
+        format_original:
+          enum:
+          - bmp
+          - gif
+          - heic
+          - heif
+          - ico
+          - jpeg
+          - mov
+          - mp4
+          - png
+          - svg
+          - wmv
+          type: string
+        rank:
+          type: number
+          minimum: 1
+          maximum: 10000
+          nullable: True
+        size:
+          type: integer
+          minimum: 0
+        sha1:
+          description: Sha1 checksum
+          type: string
+          readOnly: true
+        sha256:
+          description: Sha256 checksum
+          type: string
+          readOnly: true
+        is_encrypted:
+          description: Encrypted at rest
+          type: boolean
+          default: false
+          readOnly: true
+        compression:
+          type: string
+          readOnly: true
+        datetime_original:
+          type: string
+          format: date-time
+          readOnly: true
+        gps_altitude:
+          type: number
+          minimum: -180.0
+          maximum: 180.0
+          readOnly: true
+        geo:
+          type: array
+          items:
+            type: number
+            minimum: -180.0
+            maximum: 180.0
+          maxItems: 2
+          readOnly: true
+        height:
+          type: integer
+          readOnly: true
+        make:
+          type: string
+          readOnly: true
+        model:
+          type: string
+          readOnly: true
+        orientation:
+          type: integer
+          readOnly: true
+        width:
+          type: integer
+          readOnly: true
+        album_id:
+          $ref: '#/components/schemas/base/properties/id'
+          nullable: True
+        storage_id:
+          $ref: '#/components/schemas/base/properties/id'
+        uid:
+          $ref: '#/components/schemas/base/properties/id'
+        privacy:
+          $ref: '#/components/schemas/Storage/properties/privacy'
+          # default: invitee
+        owner:
+          $ref: '#/components/schemas/File/properties/owner'
+          readOnly: true
+      required:
+      - name
+      - size
+      - storage_id
+      title: a picture
+    Storage:
+      <<: *schema_base
+      description: A storage volume
+      example:
+        name: photos
+        privacy: public
+      properties:
+        <<: *base_endpoints
+        name:
+          type: string
+          minLength: 2
+          maxLength: 32
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF _&.-]+$
+        prefix:
+          type: string
+          maxLength: 128
+          pattern: ^[a-zA-Z0-9\u00C0-\u00FF @#~_/.=^+-]*$
+          nullable: True
+        bucket:
+          description: Bucket name
+          type: string
+          minLength: 2
+          maxLength: 64
+        identifier:
+          description: Identifier assigned by vendor
+          type: string
+          maxLength: 64
+          nullable: True
+        api_url:
+          description: URL of service API, if required
+          type: string
+          maxLength: 64
+          nullable: True
+          format: url
+        credentials_id:
+          $ref: '#/components/schemas/base/properties/id'
+        privacy:
+          enum:
+          - public
+          - invitee
+          - member
+          - manager
+          - secret
+          type: string
+          # default: public
+        owner:
+          type: string
+          minLength: 4
+          maxLength: 32
+          pattern: ^[a-z0-9@_.-]+$
+          readOnly: true
+      required:
+      - name
+      title: a storage volume
+      type: object
+      xml:
+        name: Storage
+    ApiResponse:
+      description: Describes the result of uploading a resource
+      example:
+        code: 0
+        type: type
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        type:
+          type: string
+        message:
+          type: string
+      title: an uploaded response
+      type: object
+
+  securitySchemes:
+    basic:
+      type: http
+      scheme: basic
+      x-basicInfoFunc: auth.basic_auth
+    media_apikey:
+      in: header
+      name: api_key
+      type: apiKey
+      x-apikeyInfoFunc: auth.api_key
+
+paths:
+  /album:
+    get:
+      summary: Find albums by conditions
+      description: Find albums based on conditions
+      operationId: find
+      parameters:
+      - description: Album ID
+        in: query
+        name: id
+        schema:
+          $ref: '#/components/schemas/base/properties/id'
+      - description: Album name
+        in: query
+        name: name
+        schema:
+          $ref: '#/components/schemas/Album/properties/name'
+      - description: Status
+        in: query
+        name: status
+        schema:
+          $ref: '#/components/schemas/base/properties/status'
+      - description: Maximum records to fetch
+        in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 10000
+      - description: Record offset for pagination
+        in: query
+        name: offset
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+      - description: Sort-by field
+        in: query
+        name: sort
+        schema:
+          type: string
+          maxLength: 20
+      - description: Sort-order field
+        in: query
+        name: order
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+      - description: Filter field
+        in: query
+        name: filter
+        schema:
+          type: string
+          maxLength: 2048
+      - description: Pagination token
+        in: query
+        name: cursor_next
+        schema:
+          type: string
+          format: b64string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+                  $ref: '#/components/schemas/Album'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid conditions supplied
+        404:
+          content: {}
+          description: album not found
+      security:
+      - basic: []
+      tags:
+      - album
+      x-codegen-request-body-name: conditions
+      x-openapi-router-controller: controllers.album.AlbumController
+    post:
+      summary: Create a new album
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Album'
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - basic: []
+      tags:
+      - album
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.album.AlbumController
+  /album/{id}:
+    get:
+      summary: Find album by ID
+      description: Returns a single album
+      operationId: get
+      parameters:
+      - description: ID of album to return
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      - description: Fetch details for gallery display
+        in: query
+        name: details
+        schema:
+          type: boolean
+          default: false
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid ID supplied
+        404:
+          content: {}
+          description: album not found
+      security:
+      - basic: []
+      tags:
+      - album
+      x-openapi-router-controller: controllers.album.AlbumController
+    put:
+      summary: Update an existing album
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Album'
+        required: true
+      parameters:
+      - description: album to modify
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        404:
+          content: {}
+          description: album not found
+        405:
+          content: {}
+          description: Validation exception
+      security:
+      - basic: []
+      tags:
+      - album
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.album.AlbumController
+  /album/{ids}:
+    delete:
+      summary: Delete one or more albums
+      operationId: delete
+      parameters:
+      - description: album ids to delete
+        in: path
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+            minLength: 10
+            maxLength: 10
+          type: array
+      - description: force-delete instead of disable
+        in: query
+        name: force
+        schema:
+          default: false
+          type: boolean
+      responses:
+        400:
+          content: {}
+          description: Invalid id value
+      security:
+      - basic: []
+      tags:
+      - album
+      x-openapi-router-controller: controllers.album.AlbumController
+  /file:
+    get:
+      summary: Find files by conditions
+      description: Find files based on conditions
+      operationId: find
+      parameters:
+      - description: File ID
+        in: query
+        name: id
+        schema:
+          $ref: '#/components/schemas/base/properties/id'
+      - description: File name
+        in: query
+        name: name
+        schema:
+          $ref: '#/components/schemas/File/properties/name'
+      - description: Status
+        in: query
+        name: status
+        schema:
+          $ref: '#/components/schemas/base/properties/status'
+      - description: Maximum records to fetch
+        in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 10000
+      - description: Record offset for pagination
+        in: query
+        name: offset
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+      - description: Sort-by field
+        in: query
+        name: sort
+        schema:
+          type: string
+          maxLength: 20
+      - description: Sort-order field
+        in: query
+        name: order
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+      - description: Filter field
+        in: query
+        name: filter
+        schema:
+          type: string
+          maxLength: 2048
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid conditions supplied
+        404:
+          content: {}
+          description: file not found
+      security:
+      - basic: []
+      tags:
+      - file
+      x-openapi-router-controller: controllers.file.FileController
+    post:
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+        description: Create a new file
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - basic: []
+      summary: Create a new file
+      tags:
+      - file
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.file.FileController
+  /file/{id}:
+    get:
+      description: Returns a single file
+      operationId: get
+      parameters:
+      - description: ID of file to return
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid ID supplied
+        404:
+          content: {}
+          description: file not found
+      security:
+      - basic: []
+      summary: Find file by ID
+      tags:
+      - file
+      x-openapi-router-controller: controllers.file.FileController
+    put:
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+        description: Update a file
+        required: true
+      parameters:
+      - description: file to modify
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        404:
+          content: {}
+          description: file not found
+        405:
+          content: {}
+          description: Validation exception
+      security:
+      - basic: []
+      summary: Update an existing file
+      tags:
+      - file
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.file.FileController
+  /file/{ids}:
+    delete:
+      operationId: delete
+      parameters:
+      - description: file ids to delete
+        in: path
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+            minLength: 10
+            maxLength: 10
+          type: array
+      - description: force-delete instead of disable
+        in: query
+        name: force
+        schema:
+          default: false
+          type: boolean
+      responses:
+        400:
+          content: {}
+          description: Invalid id value
+      security:
+      - basic: []
+      summary: Deletes one or more files
+      tags:
+      - file
+      x-openapi-router-controller: controllers.file.FileController
+  /file_upload_url:
+    post:
+      summary: generate a presigned url for upload
+      operationId: file_upload_url
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileUploadPresign'
+        description: Request presigned URL for file upload
+        required: true
+      responses:
+        404:
+          content: {}
+          description: storage volume not found
+        405:
+          content: {}
+          description: Validation exception
+      tags:
+      - file
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.file.FileController
+  /upload_complete/{id}:
+    post:
+      summary: process uploaded file
+      operationId: upload_complete
+      parameters:
+      - description: ID of new file
+        in: path
+        name: id
+        schema:
+          $ref: '#/components/schemas/base/properties/id'
+      - description: status of upload
+        in: query
+        name: status
+        schema:
+          enum:
+          - aborted
+          - done
+          - error_upload
+          type: string
+      responses:
+        201:
+          description: processing started
+        404:
+          content: {}
+          description: id not found
+        405:
+          content: {}
+          description: Validation exception
+      tags:
+      - file
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.file.FileController
+  /health:
+    get:
+      summary: Health Check
+      description: Status of API
+      operationId: get
+      parameters:
+      - description: Tests to run
+        in: query
+        name: tests
+        required: false
+        schema:
+          items:
+            type: string
+            maxLength: 10
+          type: array
+      responses:
+        200:
+          content: {}
+          description: Health check status
+        503:
+          content: {}
+          description: Service unhealthy
+      tags:
+      - health
+      x-openapi-router-controller: controllers.health.HealthController
+  /picture:
+    get:
+      summary: Find pictures by conditions
+      description: Find pictures based on conditions
+      operationId: find
+      parameters:
+      - description: Picture ID
+        in: query
+        name: id
+        schema:
+          $ref: '#/components/schemas/base/properties/id'
+      - description: Picture's caption
+        in: query
+        name: caption
+        schema:
+          $ref: '#/components/schemas/Picture/properties/caption'
+      - description: Status
+        in: query
+        name: status
+        schema:
+          $ref: '#/components/schemas/base/properties/status'
+      - description: Maximum records to fetch
+        in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 10000
+      - description: Record offset for pagination
+        in: query
+        name: offset
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+      - description: Sort-by field
+        in: query
+        name: sort
+        schema:
+          type: string
+          maxLength: 20
+      - description: Sort-order field
+        in: query
+        name: order
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+      - description: Filter field
+        in: query
+        name: filter
+        schema:
+          type: string
+          maxLength: 2048
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Picture'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid conditions supplied
+        404:
+          content: {}
+          description: picture not found
+      security:
+      - basic: []
+      tags:
+      - picture
+      x-openapi-router-controller: controllers.picture.PictureController
+    post:
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Picture'
+        description: Create a new picture
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - basic: []
+      summary: Create a new picture
+      tags:
+      - picture
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.picture.PictureController
+  /picture/{id}:
+    get:
+      description: Returns a single picture
+      operationId: get
+      parameters:
+      - description: ID of picture to return
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Picture'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid ID supplied
+        404:
+          content: {}
+          description: picture not found
+      security:
+      - basic: []
+      summary: Find picture by ID
+      tags:
+      - picture
+      x-openapi-router-controller: controllers.picture.PictureController
+    put:
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Picture'
+        description: Update a picture
+        required: true
+      parameters:
+      - description: picture to modify
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        404:
+          content: {}
+          description: picture not found
+        405:
+          content: {}
+          description: Validation exception
+      security:
+      - basic: []
+      summary: Update an existing picture
+      tags:
+      - picture
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.picture.PictureController
+  /picture/{ids}:
+    delete:
+      operationId: delete
+      parameters:
+      - description: picture ids to delete
+        in: path
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+            minLength: 10
+            maxLength: 10
+          type: array
+      - description: force-delete instead of disable
+        in: query
+        name: force
+        schema:
+          default: false
+          type: boolean
+      responses:
+        400:
+          content: {}
+          description: Invalid id value
+      security:
+      - basic: []
+      summary: Deletes one or more pictures
+      tags:
+      - picture
+      x-openapi-router-controller: controllers.picture.PictureController
+  /storage:
+    get:
+      summary: Find storage volumes by conditions
+      description: Find storage volumes based on conditions
+      operationId: find
+      parameters:
+      - description: Storage ID
+        in: query
+        name: id
+        schema:
+          $ref: '#/components/schemas/base/properties/id'
+      - description: Storage volume name
+        in: query
+        name: name
+        schema:
+          $ref: '#/components/schemas/Storage/properties/name'
+      - description: Status
+        in: query
+        name: status
+        schema:
+          $ref: '#/components/schemas/base/properties/status'
+      - description: Maximum records to fetch
+        in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 10000
+      - description: Record offset for pagination
+        in: query
+        name: offset
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+      - description: Sort-by field
+        in: query
+        name: sort
+        schema:
+          type: string
+          maxLength: 20
+      - description: Sort-order field
+        in: query
+        name: order
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+      - description: Filter field
+        in: query
+        name: filter
+        schema:
+          type: string
+          maxLength: 2048
+      - description: Pagination token
+        in: query
+        name: cursor_next
+        schema:
+          type: string
+          format: b64string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+                  $ref: '#/components/schemas/Storage'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid conditions supplied
+        404:
+          content: {}
+          description: storage volume not found
+      security:
+      - basic: []
+      tags:
+      - storage
+      x-codegen-request-body-name: conditions
+      x-openapi-router-controller: controllers.storage.StorageController
+    post:
+      summary: Create a new storage volume
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Storage'
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - basic: []
+      tags:
+      - storage
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.storage.StorageController
+  /storage/{id}:
+    get:
+      summary: Find storage volume by ID
+      description: Returns a single storage volume
+      operationId: get
+      parameters:
+      - description: ID of storage volume to return
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Storage'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid ID supplied
+        404:
+          content: {}
+          description: storage volume not found
+      security:
+      - basic: []
+      tags:
+      - storage
+      x-openapi-router-controller: controllers.storage.StorageController
+    put:
+      summary: Update an existing storage volume
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Storage'
+        required: true
+      parameters:
+      - description: storage volume to modify
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 10
+      responses:
+        404:
+          content: {}
+          description: storage volume not found
+        405:
+          content: {}
+          description: Validation exception
+      security:
+      - basic: []
+      tags:
+      - storage
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.storage.StorageController
+  /storage/{ids}:
+    delete:
+      summary: Delete one or more storage volumes
+      operationId: delete
+      parameters:
+      - description: storage volume ids to delete
+        in: path
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+            minLength: 10
+            maxLength: 10
+          type: array
+      - description: force-delete instead of disable
+        in: query
+        name: force
+        schema:
+          default: false
+          type: boolean
+      responses:
+        400:
+          content: {}
+          description: Invalid id value
+      security:
+      - basic: []
+      tags:
+      - storage
+      x-openapi-router-controller: controllers.storage.StorageController

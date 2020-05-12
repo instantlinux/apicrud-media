@@ -1,0 +1,28 @@
+{
+  "Statement": [
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::example-dev/*",
+      "Principal": {
+        "AWS": [
+          "*"
+        ]
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::690633123456:user/example-dev"
+      },
+      "Action": [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::example-dev/*"
+    }
+  ]
+}
