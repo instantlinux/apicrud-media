@@ -1,5 +1,5 @@
 ## apicrud-media
-[![](https://img.shields.io/pypi/v/apicrud-media.svg)](https://pypi.org/project/apicrud-media/) [![](https://images.microbadger.com/badges/image/instantlinux/example-api.svg)](https://microbadger.com/images/instantlinux/example-api "Image badge") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/pipeline.svg)](https://gitlab.com/instantlinux/apicrud-media/pipelines "pipelines") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/coverage.svg)](https://gitlab.com/instantlinux/apicrud-media/-/jobs/artifacts/master/file/apicrud-media/htmlcov/index.html?job=analysis "coverage")
+[![](https://images.microbadger.com/badges/image/instantlinux/example-api.svg)](https://microbadger.com/images/instantlinux/example-api "Image badge") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/pipeline.svg)](https://gitlab.com/instantlinux/apicrud-media/pipelines "pipelines") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/coverage.svg)](https://gitlab.com/instantlinux/apicrud-media/-/jobs/artifacts/master/file/apicrud-media/htmlcov/index.html?job=analysis "coverage")
 
 ### What is this
 

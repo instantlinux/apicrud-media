@@ -77,21 +77,21 @@ wipe_clean: clean
 	rm -rf python_env
 
 create_image:
-	@echo docker build -t $(REGISTRY)/$(APPNAME)-$(CI_JOB_NAME):$(TAG)
-	@docker build -t $(REGISTRY)/$(APPNAME)-$(CI_JOB_NAME):$(TAG) . \
-	 -f $(APPNAME)/Dockerfile.$(CI_JOB_NAME) \
+	@echo docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
+	@docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
+	 -f Dockerfile.$(CI_JOB_NAME) \
 	 --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
 	 --build-arg=TAG=$(TAG) \
 	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) && \
-	docker push $(REGISTRY)/$(APPNAME)-$(CI_JOB_NAME):$(TAG)
+	docker push $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
 
 promote_images:
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \
-	  docker pull $(REGISTRY)/$(APPNAME)-$${image}:$(TAG) && \
-	  docker tag $(REGISTRY)/$(APPNAME)-$${image}:$(TAG) \
-	    $(REGISTRY)/$(APPNAME)-$${image}:latest && \
-	  docker push $(REGISTRY)/$(APPNAME)-$${image}:latest \
+	  docker pull $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) && \
+	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
+	    $(REGISTRY)/$(IMGNAME)-$${image}:latest && \
+	  docker push $(REGISTRY)/$(IMGNAME)-$${image}:latest \
 	;)
 ifneq ($(CI_COMMIT_TAG),)
 	# Also push to dockerhub, if registry is somewhere like GitLab
@@ -99,17 +99,17 @@ ifneq ($(REGISTRY), $(USER_LOGIN))
 	docker login -u $(USER_LOGIN) -p $(DOCKER_TOKEN)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \
-	  docker tag $(REGISTRY)/$(APPNAME)-$${image}:$(TAG) \
-	    $(USER_LOGIN)/$(APPNAME)-$${image}:$(CI_COMMIT_TAG) && \
-	  docker tag $(REGISTRY)/$(APPNAME)-$${image}:$(TAG) \
-	    $(USER_LOGIN)/$(APPNAME)-$${image}:latest && \
-	  docker push $(USER_LOGIN)/$(APPNAME)-$${image}:$(CI_COMMIT_TAG) && \
-	  docker push $(USER_LOGIN)/$(APPNAME)-$${image}:latest \
+	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
+	    $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
+	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
+	    $(USER_LOGIN)/$(IMGNAME)-$${image}:latest && \
+	  docker push $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
+	  docker push $(USER_LOGIN)/$(IMGNAME)-$${image}:latest \
 	;)
-	curl -X post https://hooks.microbadger.com/images/$(USER_LOGIN)/$(APPNAME)-$${image}/$(MICROBADGER_TOKEN)
+	curl -X post https://hooks.microbadger.com/images/$(USER_LOGIN)/$(IMGNAME)-$${image}/$(MICROBADGER_TOKEN)
 endif
 endif
 
 clean_images:
-	docker rmi $(REGISTRY)/$(APPNAME)-api:$(TAG) || true
-	docker rmi $(REGISTRY)/$(APPNAME)-worker:$(TAG) || true
+	docker rmi $(REGISTRY)/$(IMGNAME)-api:$(TAG) || true
+	docker rmi $(REGISTRY)/$(IMGNAME)-worker:$(TAG) || true

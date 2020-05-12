@@ -31,18 +31,18 @@ analysis:
   - XARGS=--runslow make test
   artifacts:
     paths:
-    - apicrud/htmlcov/
+    - media/htmlcov/
     - tests/results.xml
     reports:
       junit: tests/results.xml
   coverage: '/TOTAL.*\s(\d+)%/'
 
-api:
+media:
   stage: Images
   <<: *registry_login
   <<: *create_image
 
-worker:
+media-worker:
   stage: Images
   <<: *registry_login
   <<: *create_image
@@ -54,7 +54,7 @@ test:
 promote_images:
   stage: Promote Images
   <<: *registry_login
-  script: IMAGES="api worker" make promote_images
+  script: IMAGES="media media-worker" make promote_images
   only: [ master, tags ]
 
 clean:
