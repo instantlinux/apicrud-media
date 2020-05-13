@@ -3,6 +3,7 @@
 *.egg-info
 *.pyc
 .coverage
+.proto.sqlite
 build
 coverage.xml
 dist

@@ -5,9 +5,9 @@ info:
   description: |
     This is the media server for photos/videos and file attachments.
 servers:
-- url: https://media.example.com/api/v1
 - url: http://localhost:8085/api/v1
 - url: http://localhost:32085/api/v1
+- url: https://media.example.com/api/v1
 
 components:
   schemas:
@@ -414,35 +414,68 @@ components:
       type: object
       xml:
         name: Storage
-    ApiResponse:
-      description: Describes the result of uploading a resource
+    Auth:
+      description: Authenticate
       example:
-        code: 0
-        type: type
-        message: message
+        username: fsmith
+        password: mysecret
       properties:
-        code:
-          format: int32
-          type: integer
-        type:
+        username:
           type: string
-        message:
+          minLength: 4
+          maxLength: 32
+          pattern: ^[a-z0-9@_.-]+$
+        password:
           type: string
-      title: an uploaded response
+          minLength: 8
+          maxLength: 64
+          format: password
       type: object
 
   securitySchemes:
     basic:
       type: http
       scheme: basic
-      x-basicInfoFunc: auth.basic_auth
+      x-basicInfoFunc: apicrud.session_auth.basic
     media_apikey:
       in: header
       name: api_key
       type: apiKey
-      x-apikeyInfoFunc: auth.api_key
+      x-apikeyInfoFunc: aicrud.session_auth.api_key
 
 paths:
+  /auth:
+    post:
+      summary: Authenticate
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth'
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      tags:
+      - auth
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: controllers.auth.AuthController
+  /logout:
+    get:
+      summary: Log out
+      operationId: logout
+      responses:
+        200:
+          content: {}
+          description: Logged out
+        405:
+          content: {}
+          description: Invalid input
+      tags:
+      - auth
+      x-openapi-router-controller: controllers.auth.AuthController
   /album:
     get:
       summary: Find albums by conditions

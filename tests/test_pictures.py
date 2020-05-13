@@ -14,7 +14,6 @@ class TestPictures(test_base.TestBase):
 
     def setUp(self):
         self.authorize()
-        self.flask = self.media_flask
         response = self.call_endpoint('/album?filter={"name":"album1"}', 'get')
         result = response.get_json()
         if response.status_code == 200 and result['count'] == 1:
@@ -49,7 +48,7 @@ class TestPictures(test_base.TestBase):
 
     def test_add_pictures_fetch_album(self):
         expected = dict(
-            name='album2', event_id=None, list_id=None, category='default',
+            name='album2', list_id=None, category='default',
             category_id=self.cat_id, privacy='invitee',
             sizes=[int(x)
                    for x in constants.DEFAULT_THUMBNAIL_SIZES.split(',')],

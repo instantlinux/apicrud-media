@@ -6,7 +6,7 @@ PYPI_URL   ?= https://upload.pypi.org/legacy/
 PYPI_USER  ?= $(USER)
 VERSION    ?= $(shell grep -o '[0-9.]*' media/_version.py)
 export REGISTRY    ?= $(REGISTRY_URI)/$(CI_PROJECT_PATH)
-export MEDIA_ENV ?= local
+export APP_ENV ?= local
 
 include Makefile.vars
 
@@ -22,7 +22,7 @@ media_worker:
 	. $(VDIR)/bin/activate &&  \
 	  AMQ_HOST=$(RABBITMQ_IP) REDIS_HOST=$(REDIS_IP) \
 	  PYTHONPATH=media \
-	  celery -A media_worker worker -Q media_$(MEDIA_ENV) \
+	  celery -A media_worker worker -Q media_$(APP_ENV) \
 	  -n media1@%h --loglevel=INFO
 
 VENV=python_env
@@ -54,9 +54,9 @@ $(VDIR)/lib/python3.6/site-packages/flask/app.py: python_env
 py_requirements: $(VDIR)/lib/python3.6/site-packages/flask/app.py
 test_requirements: $(VDIR)/lib/python3.6/site-packages/pytest.py
 
-test: test_requirements py_requirements
+test: test_requirements py_requirements media/.proto.sqlite
 	@echo "Running pytest unit tests"
-	-cd media && \
+	cd media && \
 	(. $(VDIR)/bin/activate && \
 	 PYTHONPATH=. python3 -m pytest $(XARGS) ../tests \
 	 --maxfail=$(MAXFAIL) \
@@ -65,10 +65,15 @@ test: test_requirements py_requirements
 	 --cov-report html \
 	 --cov-report xml \
 	 --cov-report term-missing \
+	 --cov ../python_env/lib/python*/site-packages/apicrud/media \
 	 --cov .)
-	@echo TODO stop ignoring errors
+
+media/.proto.sqlite:
+	@echo Generating prototype sqlite db
+	sqlite3 $@ < tests/schema-cac2000912a5.sql
+
 clean:
-	rm -rf build dist *.egg-info .cache .pytest_cache \
+	rm -rf build dist *.egg-info .cache .pytest_cache media/.proto.sqlite \
 	 apicrud/__pycache__ media/__pycache__ tests/__pycache__
 	find . -regextype egrep -regex \
          '.*(coverage.xml|results.xml|\.pyc|htmlcov|\.coverage|\.created|~)' \

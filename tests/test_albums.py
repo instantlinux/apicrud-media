@@ -14,12 +14,11 @@ class TestAlbums(test_base.TestBase):
 
     def setUp(self):
         self.authorize(username=self.admin_name, password=self.admin_pw)
-        self.flask = self.media_flask
 
     def test_add_and_fetch_album(self):
         record = dict(name='my album', sizes=[240, 1024])
         expected = dict(
-            cover_id=None, event_id=None, list_id=None, category='default',
+            cover_id=None, list_id=None, category='default',
             pictures=[], category_id=self.adm_cat_id, privacy='invitee',
             encryption=None, password=None, owner=self.adm_person_name,
             uid=self.admin_uid, rbac='dru', status='active',
@@ -39,7 +38,7 @@ class TestAlbums(test_base.TestBase):
             int(x) for x in constants.DEFAULT_THUMBNAIL_SIZES.split(',')])
         updated = dict(name='album two')
         expected = dict(
-            cover_id=None, event_id=None, list_id=None,
+            cover_id=None, list_id=None,
             pictures=[], category='default', category_id=self.adm_cat_id,
             privacy='invitee', owner=self.adm_person_name,
             encryption=None, password=None, uid=self.admin_uid,
@@ -81,7 +80,7 @@ class TestAlbums(test_base.TestBase):
         record = dict(name='wedding cake', sizes=[
             int(x) for x in constants.DEFAULT_THUMBNAIL_SIZES.split(',')])
         expected = dict(
-            cover_id=None, event_id=None, list_id=None,
+            cover_id=None, list_id=None,
             pictures=[], category='default', category_id=self.adm_cat_id,
             privacy='invitee', owner=self.adm_person_name,
             encryption=None, password=None, uid=self.admin_uid,

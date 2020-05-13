@@ -9,7 +9,8 @@ import celery
 import logging
 
 from apicrud.database import get_session
-from apicrud.media.worker_processing import MediaProcessing
+from apicrud.media.worker_processing import MediaProcessing, \
+    MediaUploadException
 import celeryconfig
 import config
 import constants

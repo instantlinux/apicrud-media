@@ -8,10 +8,9 @@ created 9-dec-2019 by richb@instantlinux.net
 import connexion
 from datetime import datetime
 from flask import g
-import logging
 
 import config
-from controllers import _init
+import controllers
 import db_schema
 import models
 from apicrud import database, utils
@@ -20,18 +19,13 @@ from apicrud.session_manager import SessionManager
 
 application = connexion.FlaskApp(__name__)
 utils.initialize_app(application, config, models)
-resources = _init.controllers()
 
 
 @application.app.before_first_request
 def setup_db(db_url=config.DB_URL, redis_conn=None, migrate=False,
              schema_update=db_schema.update):
-    ServiceRegistry(config).register(resources)
-    if __name__ in ['__main__', 'main', 'uwsgi_file_media_main']:
-        # TODO remove
-        logging.info(dict(action='setup_db', db_url=db_url,
-                          redis_host=config.REDIS_HOST,
-                          schema_maxtime=config.DB_SCHEMA_MAXTIME))
+    ServiceRegistry(config).register(controllers.resources())
+    if __name__ in ['__main__', 'main', 'uwsgi_file_main']:
         database.initialize_db(
             models, db_url=db_url, redis_host=config.REDIS_HOST,
             redis_conn=redis_conn,
@@ -44,9 +38,8 @@ def setup_db(db_url=config.DB_URL, redis_conn=None, migrate=False,
 @application.app.before_request
 def before_request():
     g.db = database.get_session()
-    # TODO for unittest
-    # g.session = SessionManager(config, redis_conn=config.redis_conn)
-    g.session = SessionManager(config)
+    # TODO get rid of config.redis_conn
+    g.session = SessionManager(config, redis_conn=config.redis_conn)
     g.request_start_time = datetime.utcnow()
 
 

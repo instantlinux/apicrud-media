@@ -6,7 +6,7 @@ stages:
   - Analyze and Unit Test
   - Images
   - Functional Tests
-  - Promote Images
+  - Publish Packages
   - Clean
 
 image: instantlinux/python-builder:3.8.2-r0
@@ -52,7 +52,7 @@ test:
   script: make test_functional
 
 promote_images:
-  stage: Promote Images
+  stage: Publish Packages
   <<: *registry_login
   script: IMAGES="media media-worker" make promote_images
   only: [ master, tags ]

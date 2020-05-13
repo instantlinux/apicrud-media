@@ -15,12 +15,11 @@ class TestStorage(test_base.TestBase):
         self.authorize(username=self.admin_name, password=self.admin_pw)
         # self.bucket = 'unittest-bucket'
         self.bucket = constants.DEFAULT_BUCKET
-        self.flask = self.media_flask
 
     def test_add_and_fetch_storage(self):
         record = dict(name='my storage', bucket=self.bucket)
         expected = dict(
-            prefix='', cdn_uri=None, identifier=None, credentials_id=None,
+            prefix=None, cdn_uri=None, identifier=None, credentials_id=None,
             region=constants.DEFAULT_AWS_REGION,
             privacy='public', owner=self.adm_person_name, uid=self.admin_uid,
             rbac='dru', status='active', **record)
@@ -37,7 +36,7 @@ class TestStorage(test_base.TestBase):
         record = dict(name='your storage', bucket='bucket2')
         updated = dict(name='storage two')
         expected = dict(
-            prefix='', cdn_uri=None, identifier=None, credentials_id=None,
+            prefix=None, cdn_uri=None, identifier=None, credentials_id=None,
             region=constants.DEFAULT_AWS_REGION,
             privacy='public', owner=self.adm_person_name, uid=self.admin_uid,
             rbac='dru', status='active', **record)
@@ -60,7 +59,7 @@ class TestStorage(test_base.TestBase):
     def test_storage_delete(self):
         record = dict(name='wedding cake', bucket=self.bucket)
         expected = dict(
-            prefix='', cdn_uri=None, identifier=None, credentials_id=None,
+            prefix=None, cdn_uri=None, identifier=None, credentials_id=None,
             region=constants.DEFAULT_AWS_REGION,
             privacy='public', owner=self.adm_person_name, uid=self.admin_uid,
             rbac='dru', status='disabled', **record)

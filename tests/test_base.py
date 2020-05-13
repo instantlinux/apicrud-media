@@ -13,6 +13,7 @@ import jwt
 import os
 import pytest
 from sqlalchemy.exc import IntegrityError
+import subprocess
 import tempfile
 import unittest
 import unittest.mock
@@ -20,9 +21,9 @@ import unittest.mock
 from apicrud import database
 from apicrud.session_manager import SessionManager
 import config
-import db_schema
+import constants
 from main import application, setup_db
-from models import Account, Category, Contact, Person
+from models import Account, Category, Contact, Person, Storage
 
 global_fixture = {}
 unittest.util._MAX_LENGTH = 2000
@@ -35,6 +36,7 @@ class TestBase(unittest.TestCase):
         if not global_fixture:
             global_fixture['app'] = application.app
             global_fixture['dbfile'] = tempfile.mkstemp(prefix='_db')[1]
+            subprocess.Popen(['cp', '.proto.sqlite', global_fixture['dbfile']])
             config.DB_URL = os.environ.get(
                 'DB_URL', 'sqlite:///%s' % global_fixture['dbfile'])
             global_fixture['flask'] = global_fixture['app'].test_client()
@@ -44,17 +46,11 @@ class TestBase(unittest.TestCase):
             unittest.mock.patch(
                 'apicrud.service_registry.ServiceRegistry.update').start()
             setup_db(db_url=config.DB_URL, redis_conn=config.redis_conn)
-
-            # TODO figure out how to divert logging under pytest
-            # global_fixture['logfile_name'] = tempfile.mkstemp(
-            #     prefix='_test')[1]
         yield global_fixture
         try:
             if os.environ.get('DBCLEAN', None) != '0':
                 os.remove(global_fixture['dbfile'])
         except FileNotFoundError:
-            # TODO this is getting called for each test class
-            # (thought scope='session' would invoke only once)
             pass
 
     @classmethod
@@ -64,7 +60,7 @@ class TestBase(unittest.TestCase):
         self.redis = global_fixture['redis']
         self.maxDiff = None
 
-        self.base_url = '/api/v1'
+        self.base_url = config.BASE_URL
         self.theme_id = 'x-05a720bf'
         self.credentials = {}
         self.authuser = None
@@ -97,6 +93,12 @@ class TestBase(unittest.TestCase):
         db_session.add(record)
         record = Category(id=self.cat_id, uid=self.test_uid,
                           name='default')
+        db_session.add(record)
+        record = Storage(id=self.default_storage_id,
+                         name=constants.DEFAULT_BUCKET,
+                         cdn_uri=('https://%s.s3.amazonaws.com' %
+                                  constants.DEFAULT_BUCKET),
+                         bucket=constants.DEFAULT_BUCKET, uid=self.test_uid)
         db_session.add(record)
 
         self.admin_name = 'testadmin'
@@ -135,11 +137,6 @@ class TestBase(unittest.TestCase):
             db_session.rollback()
         db_session.remove()
 
-    @classmethod
-    def tearDownClass(self):
-        # os.remove(self.logfile_name)
-        pass
-
     def authorize(self, username=None, password=None, new_session=False):
         if not username:
             username = self.username
@@ -157,19 +154,6 @@ class TestBase(unittest.TestCase):
                 ).decode('utf-8'))
         self.authuser = username
         return 201
-
-    def guest_authorize(self, guest_id, magic):
-        if guest_id not in self.credentials:
-            response = self.call_endpoint('/auth', 'post', data=dict(
-                guest_id=guest_id, magic=magic))
-            self.assertEqual(response.status_code, 201)
-            tok = jwt.decode(response.get_json()['jwt_token'],
-                             config.JWT_SECRET, algorithms=['HS256'])
-            self.credentials[guest_id] = dict(
-                auth='Basic ' + base64.b64encode(
-                    bytes(tok['sub'] + ':' + tok['jti'], 'utf-8')
-                ).decode('utf-8'))
-        self.authuser = guest_id
 
     def call_endpoint(self, endpoint, method, data=None):
         """call an endpoint with flask.g context

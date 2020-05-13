@@ -1,4 +1,4 @@
-"""models
+"""example-app models
 
 Database model definitions for SQLalchemy
 
@@ -9,10 +9,9 @@ license: lgpl-2.1
 
 # coding: utf-8
 
-import base64
-from sqlalchemy import BIGINT, LargeBinary, BOOLEAN, BLOB, Column, Enum, \
-     Float, ForeignKey, INTEGER, SMALLINT, String, TEXT, TIMESTAMP, Unicode, \
-     UniqueConstraint
+# from geoalchemy2 import Geometry
+from sqlalchemy import BOOLEAN, Column, Enum, ForeignKey, INTEGER, String, \
+     TEXT, TIMESTAMP, Unicode, UniqueConstraint
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
@@ -61,63 +60,6 @@ class Account(Base):
                 if col.name not in [
                         'password', 'totp_secret', 'invalid_attempts',
                         'last_invalid_attempt']}
-
-
-class Album(Base):
-    __tablename__ = 'albums'
-    __table_args__ = (
-        UniqueConstraint(u'name', u'uid', name='uniq_album_user'),
-    )
-
-    id = Column(String(16), primary_key=True, unique=True)
-    name = Column(String(64), nullable=False)
-    sizes = Column(String(32), nullable=False,
-                   server_default=constants.DEFAULT_THUMBNAIL_SIZES)
-    encryption = Column(Enum(u'aes'))
-    password = Column(EncryptedType(Unicode, aes_secret, AesEngine, 'pkcs5'))
-    uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'), nullable=False)
-    list_id = Column(ForeignKey(u'lists.id'))
-    cover_id = Column(ForeignKey(u'pictures.id'))
-    category_id = Column(ForeignKey(u'categories.id'), nullable=False)
-    privacy = Column(String(8), nullable=False, server_default=u'invitee')
-    created = Column(TIMESTAMP, nullable=False, server_default=func.now())
-    modified = Column(TIMESTAMP)
-    status = Column(Enum('active', u'disabled'), nullable=False,
-                    server_default=u'active')
-
-    pictures = relationship('Picture', secondary='albumcontents',
-                            backref=backref('albums'),
-                            order_by='AlbumContent.rank')
-    cover = relationship('Picture', foreign_keys=[cover_id])
-    list = relationship('List')
-    category = relationship('Category')
-    owner = relationship('Person', foreign_keys=[uid], backref=backref(
-        'album_uid', cascade='all, delete-orphan'))
-
-    def as_dict(self):
-        retval = {col.name: getattr(self, col.name)
-                  for col in self.__table__.columns}
-        retval['pictures'] = [picture.id for picture in self.pictures]
-        return retval
-
-
-class AlbumContent(Base):
-    __tablename__ = 'albumcontents'
-    __table_args__ = (
-        UniqueConstraint(u'album_id', u'picture_id', name='uniq_albumpic'),
-    )
-
-    album_id = Column(ForeignKey(u'albums.id', ondelete='CASCADE'),
-                      primary_key=True, nullable=False)
-    picture_id = Column(ForeignKey(u'pictures.id', ondelete='CASCADE'),
-                        nullable=False, index=True)
-    rank = Column(Float)
-    created = Column(TIMESTAMP, nullable=False, server_default=func.now())
-
-    album = relationship('Album', foreign_keys=[album_id], backref=backref(
-        'albumcontents', cascade='all, delete-orphan'))
-    picture = relationship('Picture', backref=backref(
-        'albumcontents', cascade='all, delete-orphan'))
 
 
 class Category(Base):
@@ -177,6 +119,9 @@ class Contact(Base):
 
 class Credential(Base):
     __tablename__ = 'credentials'
+    __table_args__ = (
+        UniqueConstraint(u'name', u'uid', name='uniq_name_uid'),
+    )
 
     id = Column(String(16), primary_key=True, unique=True)
     name = Column(String(64), nullable=False)
@@ -205,32 +150,19 @@ class Credential(Base):
                 for col in self.__table__.columns}
 
 
-class File(Base):
-    __tablename__ = 'files'
+class DirectMessage(Base):
+    __tablename__ = 'directmessages'
 
-    id = Column(String(16), primary_key=True, unique=True)
-    name = Column(String(64), nullable=False)
-    path = Column(String(64), nullable=False)
-    mime_type = Column(String(32), nullable=False, server_default="text/plain")
-    size = Column(BIGINT)
-    sha1 = Column(LargeBinary(length=20))
-    sha256 = Column(LargeBinary(length=32))
-    storage_id = Column(ForeignKey(u'storageitems.id'))
-    list_id = Column(ForeignKey(u'list.id'))
-    privacy = Column(String(8), nullable=False, server_default=u'member')
-    uid = Column(ForeignKey(u'people.id'), nullable=False, index=True)
+    message_id = Column(ForeignKey(u'messages.id', ondelete='CASCADE'),
+                        primary_key=True, nullable=False)
+    uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'),
+                 primary_key=True, nullable=False, index=True)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
-    modified = Column(TIMESTAMP)
-    status = Column(Enum('active', u'disabled'), nullable=False,
-                    server_default=u'active')
 
-    storage = relationship('Storage')
-    # TODO
-    # list = relationship('List')
-
-    def as_dict(self):
-        return {col.name: getattr(self, col.name)
-                for col in self.__table__.columns}
+    owner = relationship('Person', foreign_keys=[uid], backref=backref(
+        'directmessages', cascade='all, delete-orphan'))
+    message = relationship('Message', backref=backref(
+        'directmessages', cascade='all, delete-orphan'))
 
 
 class Grant(Base):
@@ -273,6 +205,11 @@ class List(Base):
     modified = Column(TIMESTAMP)
     status = Column(Enum('active', u'disabled'), nullable=False)
 
+    members = relationship('Person', secondary='listmembers',
+                           backref=backref('people'), order_by='Person.name')
+    messages = relationship('Message', secondary='listmessages',
+                            backref=backref('lists'),
+                            order_by='Message.created')
     album = relationship('Album')
     files = relationship('File', secondary='listfiles',
                          backref=backref('files'))
@@ -288,22 +225,70 @@ class List(Base):
 
 
 # see https://docs.sqlalchemy.org/en/13/orm/extensions/associationproxy.html
-class ListFile(Base):
-    __tablename__ = 'listfiles'
-    __table_args__ = (
-        UniqueConstraint(u'list_id', u'file_id', name='uniq_listfile'),
-    )
+class ListMember(Base):
+    __tablename__ = 'listmembers'
 
-    file_id = Column(ForeignKey(u'files.id', ondelete='CASCADE'),
-                     primary_key=True, nullable=False)
+    uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'),
+                 primary_key=True, nullable=False)
     list_id = Column(ForeignKey(u'lists.id', ondelete='CASCADE'),
-                     nullable=False, index=True)
+                     primary_key=True, nullable=False, index=True)
+    authorization = Column(String(8), nullable=False,
+                           server_default=u'member')
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
-    file = relationship('File', foreign_keys=[file_id], backref=backref(
-        'listfiles', cascade='all, delete-orphan'))
+    person = relationship('Person', foreign_keys=[uid], backref=backref(
+        'listmembers', cascade='all, delete-orphan'))
     list = relationship('List', backref=backref(
-        'listfiles', cascade='all, delete-orphan'))
+        'listmembers', cascade='all, delete-orphan'))
+
+
+class ListMessage(Base):
+    __tablename__ = 'listmessages'
+
+    message_id = Column(ForeignKey(u'messages.id', ondelete='CASCADE'),
+                        primary_key=True, nullable=False)
+    list_id = Column(ForeignKey(u'lists.id', ondelete='CASCADE'),
+                     primary_key=True, nullable=False, index=True)
+    created = Column(TIMESTAMP, nullable=False, server_default=func.now())
+
+    message = relationship(
+        'Message', foreign_keys=[message_id], backref=backref(
+            'listmessages', cascade='all, delete-orphan'))
+    list = relationship('List', backref=backref(
+        'listmessages', cascade='all, delete-orphan'))
+
+
+class Location(Base):
+    __tablename__ = 'locations'
+
+    id = Column(String(16), primary_key=True, unique=True)
+    name = Column(String(255))
+    address = Column(String(255))
+    city = Column(String(64), nullable=False)
+    state = Column(String(16))
+    postalcode = Column(String(12))
+    country = Column(String(2), nullable=False,
+                     server_default=constants.DEFAULT_COUNTRY)
+    # MariaDB is not supported by geoalchemy2, alas
+    # geo = Column(Geometry(geometry_type='POINT'))
+    # Coordinates are stored as fixed-precision (divide by 1e7)
+    geolat = Column(INTEGER)
+    geolong = Column(INTEGER)
+    neighborhood = Column(String(32))
+    privacy = Column(String(8), nullable=False, server_default=u'public')
+    uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'), nullable=False)
+    category_id = Column(ForeignKey(u'categories.id'), nullable=False)
+    created = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    modified = Column(TIMESTAMP)
+    status = Column(Enum('active', u'disabled'), nullable=False)
+
+    category = relationship('Category')
+    owner = relationship('Person', foreign_keys=[uid], backref=backref(
+        'location_uid', cascade='all, delete-orphan'))
+
+    def as_dict(self):
+        return {col.name: getattr(self, col.name)
+                for col in self.__table__.columns}
 
 
 class Message(Base):
@@ -334,25 +319,6 @@ class Message(Base):
                 for col in self.__table__.columns}
 
 
-# Message attachments
-class MessageFile(Base):
-    __tablename__ = 'messagefiles'
-    __table_args__ = (
-        UniqueConstraint(u'message_id', u'file_id', name='uniq_messagefile'),
-    )
-
-    file_id = Column(ForeignKey(u'files.id', ondelete='CASCADE'),
-                     primary_key=True, nullable=False)
-    message_id = Column(ForeignKey(u'messages.id', ondelete='CASCADE'),
-                        nullable=False, index=True)
-    created = Column(TIMESTAMP, nullable=False, server_default=func.now())
-
-    file = relationship('File', foreign_keys=[file_id], backref=backref(
-        'messagefiles', cascade='all, delete-orphan'))
-    message = relationship('Message', backref=backref(
-        'messagefiles', cascade='all, delete-orphan'))
-
-
 class Person(Base):
     __tablename__ = 'people'
 
@@ -365,6 +331,10 @@ class Person(Base):
     modified = Column(TIMESTAMP)
     status = Column(Enum('active', u'disabled', u'suspended'), nullable=False)
 
+    lists = relationship('List', secondary='listmembers',
+                         backref=backref('lists'), lazy='dynamic')
+    profile = relationship('Profile')
+
     def as_dict(self):
         retval = {col.name: getattr(self, col.name)
                   for col in self.__table__.columns}
@@ -372,62 +342,32 @@ class Person(Base):
         return retval
 
 
-class Picture(Base):
-    __tablename__ = 'pictures'
+class Profile(Base):
+    __tablename__ = 'profileitems'
+    __table_args__ = (
+        UniqueConstraint(u'uid', u'item', name='uniq_itemuid'),
+    )
 
     id = Column(String(16), primary_key=True, unique=True)
-    name = Column(String(64), nullable=False)
-    path = Column(String(64), server_default="", nullable=False)
-    caption = Column(String(255))
     uid = Column(ForeignKey(u'people.id'), nullable=False)
-    size = Column(BIGINT)
-    sha1 = Column(LargeBinary(length=20))
-    sha256 = Column(LargeBinary(length=32))
-    thumbnail50x50 = Column(BLOB)
-    format_original = Column(Enum(
-        'gif', 'heic', 'heif', 'ico', 'jpeg', 'mov', 'mp4', 'png', 'wmv'))
-    is_encrypted = Column(BOOLEAN, nullable=False, server_default="False")
-    duration = Column(Float)
-    # selected EXIF fields
-    compression = Column(String(16))
-    datetime_original = Column(TIMESTAMP)
-    gps_altitude = Column(Float)
-    geolat = Column(INTEGER)
-    geolong = Column(INTEGER)
-    height = Column(INTEGER)
-    make = Column(String(16))
-    model = Column(String(32))
-    orientation = Column(SMALLINT)
-    #   Enum(u'Horizontal', u'Mirrored-h', u'Rotated-180',
-    #        u'Mirrored-v', u'Mirrored-h-rot-270',
-    #        u'Rotated-90', u'Mirrored-h-rot-90', u'Rotated-270')
-    width = Column(INTEGER)
-
-    privacy = Column(String(8), nullable=False, server_default=u'invitee')
-    category_id = Column(ForeignKey(u'categories.id'), nullable=False)
-    storage_id = Column(ForeignKey(u'storageitems.id'), nullable=False)
+    item = Column(Enum(u'birthday', u'employer', u'gender', u'hometown',
+                       u'jobtitle', u'lang', u'location', u'partner',
+                       u'album', u'reminders', u'tz'), nullable=False)
+    value = Column(String(32))
+    location_id = Column(ForeignKey(u'locations.id'))
+    tz_id = Column(ForeignKey(u'time_zone_name.id'))
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
     modified = Column(TIMESTAMP)
     status = Column(Enum('active', u'disabled'), nullable=False)
 
-    geo = [geolong / 1.0e7, geolat / 1.0e7]
+    location = relationship('Location')
     owner = relationship('Person', foreign_keys=[uid], backref=backref(
-        'picture_uid', cascade='all, delete-orphan'))
-    storage = relationship('Storage')
-    category = relationship('Category')
+        'profileitems', cascade='all, delete-orphan'))
+    tz = relationship('TZname')
 
     def as_dict(self):
-        retval = {col.name: getattr(self, col.name)
-                  for col in self.__table__.columns}
-        if retval.get('sha1'):
-            retval['sha1'] = retval['sha1'].hex()
-        if retval.get('sha256'):
-            retval['sha256'] = retval['sha256'].hex()
-        if retval.get('thumbnail50x50'):
-            retval['thumbnail50x50'] = (
-                'data:image/%s;base64,' % retval['format_original'] +
-                base64.b64encode(retval['thumbnail50x50']).decode('ascii'))
-        return retval
+        return {col.name: getattr(self, col.name)
+                for col in self.__table__.columns}
 
 
 class Settings(Base):
@@ -447,7 +387,6 @@ class Settings(Base):
     tz_id = Column(ForeignKey(u'time_zone_name.id'), nullable=False,
                    server_default='598')
     url = Column(String(255))
-    # theme_id = Column(ForeignKey(u'themes.id'), nullable=False)
     window_title = Column(String(127),
                           server_default=constants.WINDOW_TITLE)
     default_cat_id = Column(ForeignKey(u'categories.id'), nullable=False)
@@ -456,6 +395,8 @@ class Settings(Base):
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
     modified = Column(TIMESTAMP)
 
+    smtp_credential = relationship('Credential',
+                                   foreign_keys=[smtp_credential_id])
     default_category = relationship('Category', foreign_keys=[default_cat_id])
     administrator = relationship('Person')
     default_hostlist = relationship('List',
@@ -505,6 +446,10 @@ class TZname(Base):
     name = Column(String(32), nullable=False, unique=True)
     status = Column(Enum('active', u'disabled'), nullable=False,
                     server_default="active")
+
+    def as_dict(self):
+        return {col.name: getattr(self, col.name)
+                for col in self.__table__.columns}
 
 
 class AlembicVersion(Base):

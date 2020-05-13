@@ -23,6 +23,7 @@ APPNAME = 'Media'
 # up with a Reply-To address to the host.
 APPROVED_SENDERS = 'local-senders'
 
+BASE_URL = '/api/v1'
 if os.environ.get('DB_HOST'):
     DB_URL = ('%(dbtype)s://%(user)s:%(password)s@%(endpoint)s/%(database)s' %
               {'dbtype': os.environ.get('DB_TYPE', 'mysql+pymysql'),
@@ -65,6 +66,8 @@ REDIS_AES_SECRET = os.environ.get('REDIS_AES_SECRET', '5bj27gMy6Kbb37A7P')
 REDIS_HOST = os.environ.get('REDIS_HOST', 'example-redis')
 REDIS_PORT = 6379
 REDIS_TTL = 1200
+# TODO get rid of config.redis_conn, it's a unit-test hack
+redis_conn = None
 REGISTRY_INTERVAL = 30
 REGISTRY_TTL = 60
 SERVICE_NAME = 'media'
@@ -77,9 +80,22 @@ TOKEN_TIMEOUT = 43200
 
 if os.environ.get('CORS_ORIGINS'):
     CORS_ORIGINS = os.environ['CORS_ORIGINS'].split(',')
-elif os.environ.get('MEDIA_ENV') == 'prod':
+elif os.environ.get('APP_ENV') == 'prod':
     CORS_ORIGINS = [
         "https://www.$DOMAIN", "https://media.$DOMAIN"]
 else:
     CORS_ORIGINS = [
         "https://dev.$DOMAIN", "https://media-dev.$DOMAIN"]
+
+# Items for api auth - TODO change to use token for unit-testing
+JWT_ISSUER = 'example.%s' % os.environ.get('DOMAIN')
+JWT_SECRET = os.environ.get('JWT_SECRET', 'PY07l0g0FSqeKsyx')
+LOG_LEVEL = logging.INFO
+
+# Adjustable parameters for login sessions
+#  Time limit of sessions (measured from session start) is 2 hours in
+#  production, 24 hours in dev; admin is limited to 15 minutes in prod
+LOGIN_ADMIN_LIMIT = 900 if os.environ.get('APP_ENV') == 'prod' else 86400
+LOGIN_ATTEMPTS_MAX = 5
+LOGIN_LOCKOUT_INTERVAL = 600
+LOGIN_SESSION_LIMIT = 7200

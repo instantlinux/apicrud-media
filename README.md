@@ -15,7 +15,7 @@ This is the media-service API back-end and worker, for the _example_ application
 
 Photo and video resource storage requires an AWS S3 bucket or compatible service. Obtain an API key from your provider first, and set up an empty S3 bucket.
 
-Clone this repo to your local environment. To start the example application in a shell session (on a Linux or Mac laptop), first follow the usage instructions in [apicrud README](https://github.com/instantlinux/docker-tools/blob/master/README.md) and then:
+Clone this repo to your local environment. To start the example application in a shell session (on a Linux or Mac laptop), first follow the usage instructions in [apicrud README](https://github.com/instantlinux/apicrud/blob/master/README.md) and then:
 
 * Optional: set environment variables (as defined below) if you wish to override default values
 * Invoke `make run_media` to bring up the media API

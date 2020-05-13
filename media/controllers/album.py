@@ -5,6 +5,9 @@ Media album controller
 created 14-jan-2020 by richb@instantlinux.net
 """
 
+import logging
+
+
 from flask import g
 
 from apicrud.basic_crud import BasicCRUD
@@ -55,6 +58,7 @@ class AlbumController(BasicCRUD):
                 results["media"] = StorageAPI(
                     models=models, redis_host=config.REDIS_HOST
                 ).fetch_album_meta(id, results["sizes"][0])
+        logging.info(dict(step=1, results=results, status=status))
         return results, status
 
     @staticmethod
