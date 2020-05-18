@@ -1,4 +1,4 @@
-apicrud==0.0.18
+apicrud==0.0.19
 b2sdk==1.0.2
 boto3==1.13.11
 botocore==1.16.11
@@ -12,6 +12,6 @@ Flask-Cors==3.0.8
 Pillow==7.1.2
 requests==2.23.0
 SQLAlchemy==1.3.17
-SQLAlchemy-Utils==0.36.5
+SQLAlchemy-Utils==0.36.4
 swagger-ui-bundle==0.0.6
 # uWSGI==2.0.18
