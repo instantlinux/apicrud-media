@@ -37,7 +37,7 @@ python_env: $(VDIR)/bin/python3
 
 $(VDIR)/bin/python3:
 	@echo "Creating virtual environment"
-	python3 -m virtualenv -p python3 --system-site-packages $(VENV)
+	python3 -m venv --system-site-packages $(VENV)
 
 flake8: test_requirements
 	@echo "Running flake8 code analysis"
@@ -73,11 +73,9 @@ media/.proto.sqlite:
 	sqlite3 $@ < tests/schema-cac2000912a5.sql
 
 clean:
-	rm -rf build dist *.egg-info .cache .pytest_cache media/.proto.sqlite \
-	 apicrud/__pycache__ media/__pycache__ tests/__pycache__
-	find . -regextype egrep -regex \
-         '.*(coverage.xml|results.xml|\.pyc|htmlcov|\.coverage|\.created|~)' \
-	 -exec rm -rf {} \;
+	rm -rf build dist *.egg-info .cache .pytest_cache */__pycache__ \
+	 */.coverage */.proto.sqlite */coverage.xml */htmlcov */results.xml
+	find . -name '*.pyc' -or -name '*~' -exec rm -rf {} \;
 wipe_clean: clean
 	rm -rf python_env
 
@@ -99,11 +97,15 @@ promote_images:
 	  docker push $(REGISTRY)/$(IMGNAME)-$${image}:latest \
 	;)
 ifneq ($(CI_COMMIT_TAG),)
-	# Also push to dockerhub, if registry is somewhere like GitLab
+	# Push tagged items to two registries: REGISTRY is gitlab,
+	# USER_LOGIN refers to docker hub
 ifneq ($(REGISTRY), $(USER_LOGIN))
 	docker login -u $(USER_LOGIN) -p $(DOCKER_TOKEN)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \
+	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
+	    $(REGISTRY)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
+	  docker push $(REGISTRY)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
 	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
 	    $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
 	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
