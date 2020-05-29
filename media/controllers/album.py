@@ -5,9 +5,6 @@ Media album controller
 created 14-jan-2020 by richb@instantlinux.net
 """
 
-import logging
-
-
 from flask import g
 
 from apicrud.basic_crud import BasicCRUD
