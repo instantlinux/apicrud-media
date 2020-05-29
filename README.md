@@ -24,7 +24,7 @@ Clone this repo to your local environment. To start the example application in a
 * At upper right, go into Settings and choose Credentials tab
 * Add a new entry: `key` is your AWS API key, `secret` is the API secret
 * Choose Storage tab, add a new volume: `name` is anything you want, `bucket` is the bucket name you've set up, `credentials` is item from previous step; `CDN service URL` can be filled in from Cloudfront if you've configured it in AWS console
-* Confirm that the Settings tab shows the new default storage volume
+* Confirm that the Settings tab shows the new default storage volume, which will be available upon next login (logout now)
 * From the AWS S3 console, select the `Bucket Policy` tab for your volume and copy/paste the [aws-s3-policy.json](aws-s3-policy.json) file from this github repo into the policy editor. Adjust the bucket name and account number to match yours.
 * In the `CORS configuration` tab in the same S3 screen, copy/paste the [aws-cors.xml](aws-cors.xml) file into the configuration editor. Adjust the AllowedOrigin URL to match the hostname/port you're using for testing. Add additional CORSRule stanzas if you serve the page from more than one top-level URL.
 
@@ -33,12 +33,11 @@ Clone this repo to your local environment. To start the example application in a
 Variable | Default | Description
 -------- | ------- | -----------
 AMQ_HOST | `example-rmq` | IP address or hostname of rabbitMQ
-API_DEV_PORT | `32080` | TCP port for API service (local dev k8s)
 DB_HOST | `10.101.2.30` | IP address or hostname of MySQL-compatible database
 DB_NAME | `example_local` | Name of the database
 DOMAIN | | Domain for service URLs
-EXAMPLE_API_PORT | `8080` | TCP port for API service
 KUBECONFIG | | Config credentials filename for k8s
+MEDIA_API_PORT | `8085` | TCP port for media API service
 RABBITMQ_IP | `10.101.2.20` | IP address to use for rabbitMQ under k8s
 REDIS_IP | `10.101.2.10` | IP address for redis under k8s
 
