@@ -88,7 +88,7 @@ create_image: qemu
 	 --push -f Dockerfile.$(CI_JOB_NAME) \
 	 --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
 	 --build-arg=TAG=$(TAG) \
-	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) && \
+	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ)
 
 promote_images: qemu
 ifeq ($(CI_COMMIT_TAG),)
