@@ -81,16 +81,17 @@ clean:
 wipe_clean: clean
 	rm -rf python_env
 
-create_image:
+create_image: qemu
 	@echo docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
-	@docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
-	 -f Dockerfile.$(CI_JOB_NAME) \
+	@docker buildx build \
+	 --tag $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
+	 --push -f Dockerfile.$(CI_JOB_NAME) \
 	 --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
 	 --build-arg=TAG=$(TAG) \
 	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) && \
 	docker push $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
 
-promote_images:
+promote_images: qemu
 ifeq ($(CI_COMMIT_TAG),)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \
