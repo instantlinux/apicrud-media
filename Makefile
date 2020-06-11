@@ -28,6 +28,8 @@ media_worker:
 VENV=python_env
 VDIR=$(PWD)/$(VENV)
 
+.PHONY: qemu
+
 analysis: flake8
 
 test_functional:
@@ -79,44 +81,48 @@ clean:
 wipe_clean: clean
 	rm -rf python_env
 
-create_image:
+create_image: qemu
 	@echo docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
-	@docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
-	 -f Dockerfile.$(CI_JOB_NAME) \
+	@docker buildx build \
+	 --tag $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
+	 --push -f Dockerfile.$(CI_JOB_NAME) \
 	 --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
 	 --build-arg=TAG=$(TAG) \
-	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) && \
-	docker push $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
+	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ)
 
-promote_images:
+promote_images: qemu
+ifeq ($(CI_COMMIT_TAG),)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \
-	  docker pull $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) && \
-	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
-	    $(REGISTRY)/$(IMGNAME)-$${image}:latest && \
-	  docker push $(REGISTRY)/$(IMGNAME)-$${image}:latest \
+	  docker buildx build --platform $(PLATFORMS) \
+	    --tag $(REGISTRY)/$(IMGNAME)-$${image}:latest \
+	    --push --file Dockerfile.$${image} . \
+	    --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
+	    --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) \
 	;)
-ifneq ($(CI_COMMIT_TAG),)
+else
 	# Push tagged items to two registries: REGISTRY is gitlab,
 	# USER_LOGIN refers to docker hub
-ifneq ($(REGISTRY), $(USER_LOGIN))
 	docker login -u $(USER_LOGIN) -p $(DOCKER_TOKEN)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \
-	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
-	    $(REGISTRY)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
-	  docker push $(REGISTRY)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
-	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
-	    $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
-	  docker tag $(REGISTRY)/$(IMGNAME)-$${image}:$(TAG) \
-	    $(USER_LOGIN)/$(IMGNAME)-$${image}:latest && \
-	  docker push $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) && \
-	  docker push $(USER_LOGIN)/$(IMGNAME)-$${image}:latest \
+	  docker buildx build --platform $(PLATFORMS) \
+	    --tag $(REGISTRY)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) \
+	    --tag $(REGISTRY)/$(IMGNAME)-$${image}:latest \
+	    --tag $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) \
+	    --tag $(USER_LOGIN)/$(IMGNAME)-$${image}:latest \
+	    --push --file $(IMGNAME)/Dockerfile.$${image} . \
+	    --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
+	    --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) \
 	;)
 	curl -X post https://hooks.microbadger.com/images/$(USER_LOGIN)/$(IMGNAME)-$${image}/$(MICROBADGER_TOKEN)
-endif
 endif
 
 clean_images:
 	docker rmi $(REGISTRY)/$(IMGNAME)-api:$(TAG) || true
 	docker rmi $(REGISTRY)/$(IMGNAME)-worker:$(TAG) || true
+
+qemu:
+	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+	docker buildx create --name multibuild
+	docker buildx use multibuild

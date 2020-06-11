@@ -1,5 +1,5 @@
 ## apicrud-media
-[![](https://images.microbadger.com/badges/image/instantlinux/apicrud-media.svg)](https://microbadger.com/images/instantlinux/apicrud-media "Image badge") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/pipeline.svg)](https://gitlab.com/instantlinux/apicrud-media/pipelines "pipelines") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/coverage.svg)](https://gitlab.com/instantlinux/apicrud-media/-/jobs/artifacts/master/file/apicrud-media/htmlcov/index.html?job=analysis "coverage")
+[![](https://img.shields.io/docker/v/instantlinux/apicrud-media?sort=date)](https://microbadger.com/images/instantlinux/apicrud-media "Image badge") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/pipeline.svg)](https://gitlab.com/instantlinux/apicrud-media/pipelines "pipelines") [![](https://gitlab.com/instantlinux/apicrud-media/badges/master/coverage.svg)](https://gitlab.com/instantlinux/apicrud-media/-/jobs/artifacts/master/file/apicrud-media/htmlcov/index.html?job=analysis "coverage") ![](https://img.shields.io/badge/platform-amd64%20arm64%20arm%2Fv6%20arm%2Fv7-blue "Platform badge") [![](https://img.shields.io/badge/dockerfile-latest-blue)](https://gitlab.com/instantlinux/apicrud-media/-/blob/master/Dockerfile.media "dockerfile")
 
 ### What is this
 
