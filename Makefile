@@ -111,7 +111,7 @@ else
 	    --tag $(REGISTRY)/$(IMGNAME)-$${image}:latest \
 	    --tag $(USER_LOGIN)/$(IMGNAME)-$${image}:$(CI_COMMIT_TAG) \
 	    --tag $(USER_LOGIN)/$(IMGNAME)-$${image}:latest \
-	    --push --file $(IMGNAME)/Dockerfile.$${image} . \
+	    --push --file Dockerfile.$${image} . \
 	    --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
 	    --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) \
 	;)
