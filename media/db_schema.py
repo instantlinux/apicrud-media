@@ -6,7 +6,6 @@ created 31-mar-2019 by richb@instantlinux.net
 """
 
 import logging
-import os
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.orm import exc
 
@@ -14,18 +13,17 @@ from apicrud.database import get_session
 from models import AlembicVersion
 
 
-def update(db_engine, models, migrate=False, schema_maxtime=0,
-           script_location=os.path.join(os.path.abspath(
-               os.path.dirname(__file__)), 'alembic')):
+def update(db_engine, models, migrate=False, schema_maxtime=0):
     """Run alembic migrations for updating schema
 
     See the example/db_schema.py in main apicrud repo for full
     implementation; microservices do not update schema
 
-    params:
-      models - models to generate or update
-      migrate - perform migrations only if True
-      schema_maxtime - maximum seconds to wait for mutex
+    Args:
+      db_engine (obj): connection to database
+      models (obj): models to generate or update
+      migrate (bool): perform migrations only if True
+      schema_maxtime (int):  maximum seconds to wait for mutex
     """
     db_session = get_session(scoped=True)
     try:
