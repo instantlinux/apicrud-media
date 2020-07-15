@@ -22,11 +22,13 @@ app.config_from_object(celeryconfig)
 
 @app.task(name="tasks.media.media_worker.incoming")
 def incoming(uid, file_id):
-    """
-    Process an incoming media file after it has been stored in
+    """Process an incoming media file after it has been stored in
     the cloud bucket.
-    """
 
+    Args:
+      uid (str): User ID
+      file_id (str): ID of file
+    """
     db_session = get_session(scopefunc=celery.utils.threads.get_ident,
                              db_url=config.DB_URL)
     media = MediaProcessing(uid, file_id, config, models,

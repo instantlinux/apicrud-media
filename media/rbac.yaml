@@ -71,13 +71,6 @@ policies:
     - principal: user/{{uid}}
       resource: "{resource}:{{uid}}"
       actions: cdru
-    # TODO remove this and other commented-out redundancies
-    # - principal: event-{{list_id}}-member
-    #   resource: "{resource}:{{list_id}}"
-    #   actions: cru
-    # - principal: event-{{list_id}}-manager
-    #   resource: "{resource}:{{list_id}}"
-    #   actions: cru
     - principal: list-{{list_id}}-invitee
       resource: "{resource}:{{list_id}}"
       actions: cru
