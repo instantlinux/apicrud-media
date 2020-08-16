@@ -19,8 +19,8 @@ import unittest
 import unittest.mock
 
 from apicrud import database
+from apicrud.service_config import ServiceConfig
 from apicrud.session_manager import SessionManager
-import config
 import constants
 from main import application, setup_db
 from models import Account, Category, Contact, Person, Storage
@@ -37,15 +37,16 @@ class TestBase(unittest.TestCase):
             global_fixture['app'] = application.app
             global_fixture['dbfile'] = tempfile.mkstemp(prefix='_db')[1]
             subprocess.Popen(['cp', '.proto.sqlite', global_fixture['dbfile']])
-            config.DB_URL = os.environ.get(
+            db_url = os.environ.get(
                 'DB_URL', 'sqlite:///%s' % global_fixture['dbfile'])
+            global_fixture['config'] = ServiceConfig(db_url=db_url).config
             global_fixture['flask'] = global_fixture['app'].test_client()
             global_fixture['redis'] = fakeredis.FakeStrictRedis(
                 server=fakeredis.FakeServer())
-            config.redis_conn = global_fixture['redis']
+            redis_conn = global_fixture['redis']
             unittest.mock.patch(
                 'apicrud.service_registry.ServiceRegistry.update').start()
-            setup_db(db_url=config.DB_URL, redis_conn=config.redis_conn)
+            setup_db(db_url=db_url, redis_conn=redis_conn)
         yield global_fixture
         try:
             if os.environ.get('DBCLEAN', None) != '0':
@@ -56,11 +57,12 @@ class TestBase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.app = global_fixture['app']
+        self.config = global_fixture['config']
         self.flask = global_fixture['flask']
         self.redis = global_fixture['redis']
         self.maxDiff = None
 
-        self.base_url = config.BASE_URL
+        self.base_url = self.config.BASE_URL
         self.theme_id = 'x-05a720bf'
         self.credentials = {}
         self.authuser = None
@@ -76,7 +78,7 @@ class TestBase(unittest.TestCase):
         self.test_uid = 'u-B0miQweE'
         self.test_person_name = 'Conclave Tester'
         self.test_email = 'testuser@test.conclave.events'
-        db_session = database.get_session(db_url=config.DB_URL)
+        db_session = database.get_session(db_url=self.config.DB_URL)
         record = Person(id=self.test_uid, name=self.test_person_name,
                         identity=self.test_email, privacy='public',
                         status='active')
@@ -147,7 +149,7 @@ class TestBase(unittest.TestCase):
             if response.status_code != 201:
                 return response.status_code
             tok = jwt.decode(response.get_json()['jwt_token'],
-                             config.JWT_SECRET, algorithms=['HS256'])
+                             self.config.JWT_SECRET, algorithms=['HS256'])
             self.credentials[username] = dict(
                 auth='Basic ' + base64.b64encode(
                     bytes(tok['sub'] + ':' + tok['jti'], 'utf-8')
@@ -167,7 +169,7 @@ class TestBase(unittest.TestCase):
 
         with self.app.test_request_context():
             g.db = database.get_session()
-            g.session = SessionManager(config, redis_conn=self.redis)
+            g.session = SessionManager(self.config, redis_conn=self.redis)
             headers = {}
             if self.authuser:
                 headers['Authorization'] = self.credentials[

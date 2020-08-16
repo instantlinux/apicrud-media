@@ -1,0 +1,5 @@
+---
+# Config settings for apicrud.service_config
+appname: Media
+db_schema_maxtime: 0
+service_name: media

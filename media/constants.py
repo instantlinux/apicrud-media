@@ -13,6 +13,6 @@ DEFAULT_CAT_ID = 'x-3423ceaf'
 DEFAULT_COUNTRY = u'US'
 DEFAULT_LANG = u'en_US'
 DEFAULT_THUMBNAIL_SIZES = u'120,720'
+DEFAULT_WINDOW_TITLE = u'Example apicrud Application'
 MIME_IMAGE_TYPES = ("gif", "heic", "jpeg", "png", "svg")
 MIME_VIDEO_TYPES = ("mp4", "mpeg")
-WINDOW_TITLE = u'Example apicrud Application'

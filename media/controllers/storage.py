@@ -9,14 +9,12 @@ from flask import g
 
 from apicrud.access import AccessControl
 from apicrud.basic_crud import BasicCRUD
-import config
-import models
+from models import Account, Settings
 
 
 class StorageController(BasicCRUD):
     def __init__(self):
-        super().__init__(resource="storage", model=models.Storage,
-                         config=config, models=models)
+        super().__init__(resource="storage")
 
     @staticmethod
     def create(body):
@@ -25,8 +23,8 @@ class StorageController(BasicCRUD):
         result, status = super(StorageController, StorageController).create(
             body)
         if status == 201:
-            record = g.db.query(models.Settings).join(models.Account).filter(
-                models.Account.id == AccessControl().account_id).one()
+            record = g.db.query(Settings).join(Account).filter(
+                Account.id == AccessControl().account_id).one()
             if not record.default_storage_id:
                 record.default_storage_id = result['id']
                 g.db.add(record)

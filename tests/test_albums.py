@@ -5,7 +5,6 @@ Tests for albums controller
 created 8-nov-2019 by richb@instantlinux.net
 """
 
-import config
 import constants
 import test_base
 
@@ -30,7 +29,7 @@ class TestAlbums(test_base.TestBase):
         result = response.get_json()
         del(result['created'])
         expected['id'] = id
-        expected['sizes'].append(config.DEFAULT_GRANTS['photo_res_max'])
+        expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
         self.assertEqual(result, expected)
 
     def test_update_album(self):
@@ -97,7 +96,7 @@ class TestAlbums(test_base.TestBase):
         result = response.get_json()
         del(result['created'])
         expected['id'] = id
-        expected['sizes'].append(config.DEFAULT_GRANTS['photo_res_max'])
+        expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
 
         self.assertEqual(result, expected)
 

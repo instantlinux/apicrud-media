@@ -76,7 +76,8 @@ media/.proto.sqlite:
 
 clean:
 	rm -rf build dist *.egg-info .cache .pytest_cache */__pycache__ \
-	 */.coverage */.proto.sqlite */coverage.xml */htmlcov */results.xml
+	 */.coverage */.proto.sqlite */coverage.xml */htmlcov */results.xml \
+	 docs/_build docs/content/stubs
 	find . -name '*.pyc' -or -name '*~' -exec rm -rf {} \;
 wipe_clean: clean
 	rm -rf python_env

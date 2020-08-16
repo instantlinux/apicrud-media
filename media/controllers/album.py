@@ -10,22 +10,18 @@ from flask import g
 from apicrud.basic_crud import BasicCRUD
 from apicrud.grants import Grants
 from apicrud.media.storage import StorageAPI
-import config
-import models
 
 
 class AlbumController(BasicCRUD):
     def __init__(self):
-        super().__init__(resource="album", model=models.Album, config=config,
-                         models=models)
+        super().__init__(resource="album")
 
     @staticmethod
     def create(body):
         """add default value of storage-id, convert sizes to str
         """
         if "sizes" in body:
-            res_max = Grants(models, g.db,
-                             ttl=config.REDIS_TTL).get("photo_res_max")
+            res_max = Grants(db_session=g.db).get("photo_res_max")
             if max(body["sizes"]) > res_max:
                 return dict(message="res_max=%d exceeded" % res_max), 405
             if res_max not in body["sizes"]:
@@ -52,9 +48,8 @@ class AlbumController(BasicCRUD):
         if status == 200:
             results["sizes"] = [int(x) for x in results["sizes"].split(",")]
             if details:
-                results["media"] = StorageAPI(
-                    models=models, redis_host=config.REDIS_HOST
-                ).fetch_album_meta(id, results["sizes"][0])
+                results["media"] = StorageAPI().fetch_album_meta(
+                    id, results["sizes"][0])
         return results, status
 
     @staticmethod

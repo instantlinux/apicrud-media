@@ -5,7 +5,6 @@ Tests for picture controller
 created 24-jan-2020 by richb@instantlinux.net
 """
 
-import config
 import constants
 import test_base
 
@@ -88,7 +87,7 @@ class TestPictures(test_base.TestBase):
         for pic in range(5):
             # ignore complicated imageSet values for this test
             del(result['media'][pic]['imageSet'])
-        expected['sizes'].append(config.DEFAULT_GRANTS['photo_res_max'])
+        expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
         self.assertEqual(result, dict(id=album_id, pictures=pic_ids,
                                       cover_id=pic_ids[0], **expected))
 

@@ -8,21 +8,24 @@ created 9-dec-2019 by richb@instantlinux.net
 import connexion
 from datetime import datetime
 from flask import g
+import os
 
-import config
 import controllers
 import db_schema
 import models
 from apicrud import database, utils
+from apicrud.service_config import ServiceConfig
 from apicrud.service_registry import ServiceRegistry
 from apicrud.session_manager import SessionManager
 
 application = connexion.FlaskApp(__name__)
-utils.initialize_app(application, config, models)
+config = ServiceConfig(reset=True, file=os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), 'config.yaml'), models=models).config
+utils.initialize_app(application)
 
 
 @application.app.before_first_request
-def setup_db(db_url=config.DB_URL, redis_conn=None, migrate=False):
+def setup_db(db_url=None, redis_conn=None, migrate=False):
     """Database setup
 
     Args:
@@ -30,7 +33,8 @@ def setup_db(db_url=config.DB_URL, redis_conn=None, migrate=False):
       redis_conn (obj): connection to redis
       migrate (bool): perform migrations only if True
     """
-    ServiceRegistry(config).register(controllers.resources())
+    db_url = db_url or config.DB_URL
+    ServiceRegistry().register(controllers.resources())
     if __name__ in ['__main__', 'main', 'uwsgi_file_main']:
         database.initialize_db(
             models, db_url=db_url, redis_host=config.REDIS_HOST,
@@ -46,8 +50,7 @@ def before_request():
     """Request-setup function - get sessions to database and auth
     """
     g.db = database.get_session()
-    # TODO get rid of config.redis_conn
-    g.session = SessionManager(config, redis_conn=config.redis_conn)
+    g.session = SessionManager()
     g.request_start_time = datetime.utcnow()
 
 
@@ -66,4 +69,4 @@ def cleanup(resp_or_exc):
 
 
 if __name__ == '__main__':
-    application.run(port=config.PORT)
+    application.run(port=config.APP_PORT)
