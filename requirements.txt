@@ -7,7 +7,7 @@ jsonschema==3.2.0
 Pillow==7.1.2
 requests==2.23.0
 
-apicrud==0.0.32
+apicrud==0.0.33
 b2sdk==1.0.2
 celery==4.4.5
 connexion==2.7.0

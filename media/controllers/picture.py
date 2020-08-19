@@ -32,7 +32,7 @@ class PictureController(BasicCRUD):
         account_id = AccessControl().account_id
         if not body.get("storage_id"):
             body["storage_id"] = AccountSettings(
-                account_id, g.db).get.default_storage_id
+                account_id, db_session=g.db).get.default_storage_id
         if not body.get("is_encrypted"):
             # TODO why do I need to set an explicit default value here
             body["is_encrypted"] = False
