@@ -13,8 +13,6 @@ class TestStorage(test_base.TestBase):
 
     def setUp(self):
         self.authorize(username=self.admin_name, password=self.admin_pw)
-        # self.bucket = 'unittest-bucket'
-        self.bucket = constants.DEFAULT_BUCKET
 
     def test_add_and_fetch_storage(self):
         record = dict(name='my storage', bucket=self.bucket)

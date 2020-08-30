@@ -9,6 +9,7 @@ export REGISTRY    ?= $(REGISTRY_URI)/$(CI_PROJECT_PATH)
 export APP_ENV ?= local
 
 include Makefile.vars
+include Makefile.i18n
 
 # Local dev
 
@@ -56,7 +57,8 @@ $(VDIR)/lib/python3.6/site-packages/flask/app.py: python_env
 py_requirements: $(VDIR)/lib/python3.6/site-packages/flask/app.py
 test_requirements: $(VDIR)/lib/python3.6/site-packages/pytest.py
 
-test: test_requirements py_requirements media/.proto.sqlite
+test: test_requirements py_requirements media/.proto.sqlite \
+	    media/i18n/en/LC_MESSAGES/messages.mo
 	@echo "Running pytest unit tests"
 	cd media && \
 	(. $(VDIR)/bin/activate && \
@@ -74,6 +76,9 @@ media/.proto.sqlite:
 	@echo Generating prototype sqlite db
 	sqlite3 $@ < tests/schema-cac2000912a5.sql
 
+media/i18n/en/LC_MESSAGES/messages.mo:
+	make i18n_compile
+
 clean:
 	rm -rf build dist *.egg-info .cache .pytest_cache */__pycache__ \
 	 */.coverage */.proto.sqlite */coverage.xml */htmlcov */results.xml \
@@ -82,7 +87,7 @@ clean:
 wipe_clean: clean
 	rm -rf python_env
 
-create_image: qemu
+create_image: qemu i18n_deploy
 	@echo docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
 	@docker buildx build \
 	 --tag $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
@@ -91,7 +96,7 @@ create_image: qemu
 	 --build-arg=TAG=$(TAG) \
 	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ)
 
-promote_images: qemu
+promote_images: qemu i18n_deploy
 ifeq ($(CI_COMMIT_TAG),)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \

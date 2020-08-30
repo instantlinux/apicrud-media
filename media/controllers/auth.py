@@ -6,6 +6,8 @@ This is temporary, until API-key authentication is added
 created 17-may-2020 by richb@instantlinux.net
 """
 
+from flask_babel import _
+
 from apicrud.session_auth import SessionAuth
 import models
 
@@ -36,4 +38,4 @@ class AuthController(object):
         Returns:
           tuple: dict with message and http status code 200
         """
-        return dict(message='logged out'), 200
+        return dict(message=_(u'logged out')), 200

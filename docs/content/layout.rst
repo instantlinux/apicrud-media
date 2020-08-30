@@ -11,9 +11,8 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     ├── b2-cors.json.json
     ├── media
     │   ├── celeryconfig.py      # celery-worker parameters
-    │   ├── config.py            # application settings
+    │   ├── config.yaml          # application settings
     │   ├── constants.py         # global constants
-    │   ├── db_schema.py         # db initial seed/update functions
     │   ├── main.py              # top-level startup
     │   ├── models               # models for database schema
     │   ├── openapi.yaml         # OpenAPI 3.0 specifications
@@ -34,6 +33,10 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     ├── .github
     │   └── PULL_REQUEST_TEMPLATE.md  # template for code submission
     ├── .gitlab-ci.yml           # CI pipeline definition
+    ├── i18n                     # application language translations
+    │   ├── messages.pot         # extracted language strings
+    │   ├── ar                   # arabic message mappings
+    │   └── de (...)             # german messages (and so on)
     ├── Makefile                 # administrative utilities
     ├── .readthedocs.yml         # doc configuration
     ├── requirements.txt         # python dependencies

@@ -6,6 +6,7 @@ created 14-jan-2020 by richb@instantlinux.net
 """
 
 from flask import g
+from flask_babel import _
 
 from apicrud.basic_crud import BasicCRUD
 from apicrud.grants import Grants
@@ -23,7 +24,8 @@ class AlbumController(BasicCRUD):
         if "sizes" in body:
             res_max = Grants(db_session=g.db).get("photo_res_max")
             if max(body["sizes"]) > res_max:
-                return dict(message="res_max=%d exceeded" % res_max), 405
+                return dict(message=_(
+                    u"Maximum resolution (%d) exceeded" % res_max)), 405
             if res_max not in body["sizes"]:
                 body["sizes"].append(res_max)
             body["sizes"] = ",".join(map(str, sorted(body["sizes"])))

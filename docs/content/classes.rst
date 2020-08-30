@@ -11,7 +11,6 @@ Python Classes
 
      config
      constants
-     db_schema
      main
      media_worker
      models

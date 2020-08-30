@@ -1,0 +1,33 @@
+# Internationalization with flask-babel
+#
+# Usage:
+#   make i18n_create       - Add a new lang (after adding to LANGS)
+#   make i18n_update       - Update all langs with new extracted msgids
+#   make i18n_compile      - Generate binary files for production deploy
+#
+# The translation files are named messages.po under media/i18n.
+
+LANGS    = ar de en es fil fr it ja ko pt ru vi zh zh_Hans zh_Hant
+PO_FILES = $(patsubst %,media/i18n/%/LC_MESSAGES/messages.po,$(LANGS))
+POT_FILE = media/i18n/messages.pot example/i18n/messages.pot
+
+i18n_create: $(PO_FILES)
+i18n_compile:
+	. $(VDIR)/bin/activate ; pybabel compile -d media/i18n
+i18n_update: $(POT_FILE)
+	$(foreach file,$(POT_FILE), \
+	  rm $(file) && make $(file); \
+	  . $(VDIR)/bin/activate ; \
+	  pybabel update -i $(file) -d $(shell dirname $(file)); \
+	)
+i18n_deploy:
+	pip install flask-babel
+	umask=022; pybabel compile -d media/i18n
+
+media/i18n/messages.pot:
+	@mkdir -p $(shell dirname $@)
+	. $(VDIR)/bin/activate ; pybabel extract -o $@.tmp media \
+	  -F media/i18n/babel.cfg --omit-header
+	cat media/i18n/po_header.txt $@.tmp > $@ && rm $@.tmp
+media/i18n/%/LC_MESSAGES/messages.po: media/i18n/messages.pot
+	. $(VDIR)/bin/activate ; pybabel init -i $< -d media/i18n -l $*

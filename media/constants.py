@@ -8,7 +8,6 @@ created 31-mar-2019 by richb@instantlinux.net
 """
 
 DEFAULT_AWS_REGION = 'us-east-2'
-DEFAULT_BUCKET = 'apicrud-test'
 DEFAULT_CAT_ID = 'x-3423ceaf'
 DEFAULT_COUNTRY = u'US'
 DEFAULT_LANG = u'en_US'

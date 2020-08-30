@@ -21,7 +21,6 @@ import unittest.mock
 from apicrud import database
 from apicrud.service_config import ServiceConfig
 from apicrud.session_manager import SessionManager
-import constants
 from main import application, setup_db
 from models import Account, Category, Contact, Person, Storage
 
@@ -73,6 +72,7 @@ class TestBase(unittest.TestCase):
         self.username = 'testr'
         self.password = 't0ps3crEt'
         self.account_id = 'x-TpP43xS9'
+        self.bucket = 'apicrud-test'
         self.cat_id = 'x-Jiqag482'
         self.contact_id = 'x-E97yKy73'
         self.test_uid = 'u-B0miQweE'
@@ -96,11 +96,10 @@ class TestBase(unittest.TestCase):
         record = Category(id=self.cat_id, uid=self.test_uid,
                           name='default')
         db_session.add(record)
-        record = Storage(id=self.default_storage_id,
-                         name=constants.DEFAULT_BUCKET,
+        record = Storage(id=self.default_storage_id, name=self.bucket,
                          cdn_uri=('https://%s.s3.amazonaws.com' %
-                                  constants.DEFAULT_BUCKET),
-                         bucket=constants.DEFAULT_BUCKET, uid=self.test_uid)
+                                  self.bucket),
+                         bucket=self.bucket, uid=self.test_uid)
         db_session.add(record)
 
         self.admin_name = 'testadmin'

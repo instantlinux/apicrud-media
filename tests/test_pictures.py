@@ -22,7 +22,7 @@ class TestPictures(test_base.TestBase):
                 name='album1'))
             self.assertEqual(response.status_code, 201)
             self.album_id = response.get_json()['id']
-        self.uri = 'https://%s.s3.amazonaws.com' % constants.DEFAULT_BUCKET
+        self.uri = 'https://%s.s3.amazonaws.com' % self.bucket
 
     def test_add_and_fetch_picture(self):
         record = dict(name='my picture', size=1500, album_id=self.album_id,

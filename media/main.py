@@ -7,13 +7,15 @@ created 9-dec-2019 by richb@instantlinux.net
 
 import connexion
 from datetime import datetime
-from flask import g
+from flask import g, request
+from flask_babel import Babel
 import os
 
 import controllers
-import db_schema
 import models
 from apicrud import database, utils
+from apicrud.access import AccessControl
+from apicrud.account_settings import AccountSettings
 from apicrud.service_config import ServiceConfig
 from apicrud.service_registry import ServiceRegistry
 from apicrud.session_manager import SessionManager
@@ -22,27 +24,21 @@ application = connexion.FlaskApp(__name__)
 config = ServiceConfig(reset=True, file=os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'config.yaml'), models=models).config
 utils.initialize_app(application)
+babel = Babel(application.app)
 
 
 @application.app.before_first_request
-def setup_db(db_url=None, redis_conn=None, migrate=False):
+def setup_db(db_url=None, redis_conn=None):
     """Database setup
 
     Args:
       db_url (str): URL with db host, credentials and db name
       redis_conn (obj): connection to redis
-      migrate (bool): perform migrations only if True
     """
     db_url = db_url or config.DB_URL
     ServiceRegistry().register(controllers.resources())
     if __name__ in ['__main__', 'main', 'uwsgi_file_main']:
-        database.initialize_db(
-            models, db_url=db_url, redis_host=config.REDIS_HOST,
-            redis_conn=redis_conn,
-            migrate=migrate, geo_support=config.DB_GEO_SUPPORT,
-            connection_timeout=config.DB_CONNECTION_TIMEOUT,
-            schema_update=db_schema.update,
-            schema_maxtime=config.DB_SCHEMA_MAXTIME)
+        database.initialize_db(db_url=db_url, redis_conn=redis_conn)
 
 
 @application.app.before_request
@@ -66,6 +62,14 @@ def cleanup(resp_or_exc):
     """When a flask thread terminates, close the database session"""
     if hasattr(g, 'db'):
         g.db.remove()
+
+
+@babel.localeselector
+def get_locale():
+    acc = AccessControl()
+    if acc.auth:
+        return AccountSettings(acc.account_id, db_session=g.db).locale
+    return request.accept_languages.best_match(config.LANGUAGES)
 
 
 if __name__ == '__main__':
