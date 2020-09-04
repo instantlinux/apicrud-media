@@ -7,13 +7,14 @@
 #
 # The translation files are named messages.po under media/i18n.
 
+DIR      = media
 LANGS    = ar de en es fil fr it ja ko pt ru vi zh zh_Hans zh_Hant
-PO_FILES = $(patsubst %,media/i18n/%/LC_MESSAGES/messages.po,$(LANGS))
-POT_FILE = media/i18n/messages.pot example/i18n/messages.pot
+PO_FILES = $(patsubst %,$(DIR)/i18n/%/LC_MESSAGES/messages.po,$(LANGS))
+POT_FILE = $(DIR)/i18n/messages.pot example/i18n/messages.pot
 
 i18n_create: $(PO_FILES)
 i18n_compile:
-	. $(VDIR)/bin/activate ; pybabel compile -d media/i18n
+	. $(VDIR)/bin/activate ; pybabel compile -d $(DIR)/i18n
 i18n_update: $(POT_FILE)
 	$(foreach file,$(POT_FILE), \
 	  rm $(file) && make $(file); \
@@ -22,12 +23,12 @@ i18n_update: $(POT_FILE)
 	)
 i18n_deploy:
 	pip install flask-babel
-	umask=022; pybabel compile -d media/i18n
+	umask=022; pybabel compile -d $(DIR)/i18n
 
-media/i18n/messages.pot:
+$(DIR)/i18n/messages.pot:
 	@mkdir -p $(shell dirname $@)
-	. $(VDIR)/bin/activate ; pybabel extract -o $@.tmp media \
-	  -F media/i18n/babel.cfg --omit-header
-	cat media/i18n/po_header.txt $@.tmp > $@ && rm $@.tmp
-media/i18n/%/LC_MESSAGES/messages.po: media/i18n/messages.pot
-	. $(VDIR)/bin/activate ; pybabel init -i $< -d media/i18n -l $*
+	. $(VDIR)/bin/activate ; pybabel extract -o $@.tmp $(DIR) \
+	  -F $(DIR)/i18n/babel.cfg --omit-header
+	cat $(DIR)/i18n/po_header.txt $@.tmp > $@ && rm $@.tmp
+$(DIR)/i18n/%/LC_MESSAGES/messages.po: $(DIR)/i18n/messages.pot
+	. $(VDIR)/bin/activate ; pybabel init -i $< -d $(DIR)/i18n -l $*

@@ -9,10 +9,10 @@ import celery
 import logging
 import os
 
-from apicrud.database import get_session
+from apicrud import ServiceConfig, database
 from apicrud.media.worker_processing import MediaProcessing, \
     MediaUploadException
-from apicrud.service_config import ServiceConfig
+
 import celeryconfig
 import constants
 import models
@@ -32,8 +32,8 @@ def incoming(uid, file_id):
       uid (str): User ID
       file_id (str): ID of file
     """
-    db_session = get_session(scopefunc=celery.utils.threads.get_ident,
-                             db_url=config.DB_URL)
+    db_session = database.get_session(scopefunc=celery.utils.threads.get_ident,
+                                      db_url=config.DB_URL)
     media = MediaProcessing(uid, file_id, db_session=db_session)
     logging.info("action=incoming uid=%s name=%s file_id=%s " % (
         uid, media.meta["name"], file_id))

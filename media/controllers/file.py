@@ -5,8 +5,9 @@ File attachments controller
 created 14-jan-2020 by richb@instantlinux.net
 """
 
-from apicrud.basic_crud import BasicCRUD
+from apicrud import BasicCRUD
 from apicrud.media.storage import StorageAPI
+
 import media_worker
 
 

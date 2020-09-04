@@ -7,8 +7,8 @@ created 14-jan-2020 by richb@instantlinux.net
 
 from flask import g
 
-from apicrud.access import AccessControl
-from apicrud.basic_crud import BasicCRUD
+from apicrud import AccessControl, BasicCRUD
+
 from models import Account, Settings
 
 

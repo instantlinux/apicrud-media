@@ -8,7 +8,7 @@ created 17-may-2020 by richb@instantlinux.net
 
 from flask_babel import _
 
-from apicrud.session_auth import SessionAuth
+from apicrud import SessionAuth
 import models
 
 

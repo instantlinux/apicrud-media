@@ -8,8 +8,7 @@ created 14-jan-2020 by richb@instantlinux.net
 from flask import g
 from flask_babel import _
 
-from apicrud.basic_crud import BasicCRUD
-from apicrud.grants import Grants
+from apicrud import BasicCRUD, Grants
 from apicrud.media.storage import StorageAPI
 
 
