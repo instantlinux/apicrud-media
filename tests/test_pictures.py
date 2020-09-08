@@ -84,6 +84,7 @@ class TestPictures(test_base.TestBase):
         self.assertEqual(response.status_code, 200)
         result = response.get_json()
         del(result['created'])
+        result.pop('event_id', None)
         for pic in range(5):
             # ignore complicated imageSet values for this test
             del(result['media'][pic]['imageSet'])

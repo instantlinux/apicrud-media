@@ -18,8 +18,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
+from apicrud import ServiceConfig
+
 import constants
-from apicrud.service_config import ServiceConfig
 
 Base = declarative_base()
 aes_secret = ServiceConfig().config.DB_AES_SECRET
@@ -147,7 +148,8 @@ class Credential(Base):
 
     def as_dict(self):
         return {col.name: getattr(self, col.name)
-                for col in self.__table__.columns}
+                for col in self.__table__.columns
+                if col.name not in ['secret', 'otherdata']}
 
 
 class DirectMessage(Base):
@@ -333,7 +335,7 @@ class Person(Base):
 
     lists = relationship('List', secondary='listmembers',
                          backref=backref('lists'), lazy='dynamic')
-    profile = relationship('Profile')
+    profileitems = relationship('Profile')
 
     def as_dict(self):
         retval = {col.name: getattr(self, col.name)
@@ -362,8 +364,8 @@ class Profile(Base):
 
     location = relationship('Location')
     owner = relationship('Person', foreign_keys=[uid], backref=backref(
-        'profileitems', cascade='all, delete-orphan'))
-    tz = relationship('TZname')
+        'profile', cascade='all, delete-orphan'))
+    tz = relationship('Tz')
 
     def as_dict(self):
         return {col.name: getattr(self, col.name)
@@ -401,7 +403,7 @@ class Settings(Base):
     administrator = relationship('Person')
     default_hostlist = relationship('List',
                                     foreign_keys=[default_hostlist_id])
-    tz = relationship('TZname')
+    tz = relationship('Tz')
 
     def as_dict(self):
         return {col.name: getattr(self, col.name)
@@ -439,7 +441,7 @@ class Storage(Base):
                 for col in self.__table__.columns}
 
 
-class TZname(Base):
+class Tz(Base):
     __tablename__ = 'time_zone_name'
 
     id = Column(INTEGER, primary_key=True, unique=True)

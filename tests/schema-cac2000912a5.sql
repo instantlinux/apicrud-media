@@ -261,6 +261,7 @@ CREATE TABLE albums (
 	uid VARCHAR(16) NOT NULL, 
 	list_id VARCHAR(16), 
 	cover_id VARCHAR(16), 
+	event_id VARCHAR(16),
 	category_id VARCHAR(16) NOT NULL, 
 	privacy VARCHAR(8) DEFAULT 'invitee' NOT NULL, 
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
@@ -270,6 +271,7 @@ CREATE TABLE albums (
 	FOREIGN KEY(category_id) REFERENCES categories (id), 
 	FOREIGN KEY(cover_id) REFERENCES pictures (id), 
 	FOREIGN KEY(list_id) REFERENCES lists (id), 
+	FOREIGN KEY(event_id) REFERENCES events (id), 
 	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
 	UNIQUE (id), 
 	CONSTRAINT uniq_album_user UNIQUE (name, uid), 
@@ -339,6 +341,7 @@ CREATE TABLE files (
 	storage_id VARCHAR(16), 
 	privacy VARCHAR(8) DEFAULT 'member' NOT NULL, 
 	list_id VARCHAR(16), 
+	event_id VARCHAR(16), 
 	uid VARCHAR(16) NOT NULL, 
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
 	modified TIMESTAMP, 
@@ -346,6 +349,7 @@ CREATE TABLE files (
 	PRIMARY KEY (id), 
 	FOREIGN KEY(storage_id) REFERENCES storageitems (id), 
 	FOREIGN KEY(list_id) REFERENCES lists (id), 
+	FOREIGN KEY(event_id) REFERENCES events (id), 
 	FOREIGN KEY(uid) REFERENCES people (id), 
 	UNIQUE (id), 
 	CHECK (status IN ('active', 'disabled'))
@@ -386,6 +390,21 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
 	FOREIGN KEY(default_cat_id) REFERENCES categories (id), 
 	FOREIGN KEY(default_hostlist_id) REFERENCES lists (id)
+);
+CREATE TABLE events (
+	id VARCHAR(16) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	uid VARCHAR(16) NOT NULL, 
+	category_id VARCHAR(16) NOT NULL, 
+	privacy VARCHAR(8) DEFAULT 'public' NOT NULL, 
+	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	modified TIMESTAMP, 
+	status VARCHAR(9) NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(category_id) REFERENCES categories (id), 
+	FOREIGN KEY(uid) REFERENCES people (id), 
+	UNIQUE (id), 
+	CHECK (status IN ('active', 'canceled', 'disabled'))
 );
 INSERT INTO alembic_version (version_num) values ('cac2000912a5');
 pragma foreign_keys=off;

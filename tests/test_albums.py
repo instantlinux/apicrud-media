@@ -28,6 +28,7 @@ class TestAlbums(test_base.TestBase):
         response = self.call_endpoint('/album/%s' % id, 'get')
         result = response.get_json()
         del(result['created'])
+        result.pop('event_id', None)
         expected['id'] = id
         expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
         self.assertEqual(result, expected)
@@ -54,6 +55,7 @@ class TestAlbums(test_base.TestBase):
         result = response.get_json()
         del(result['created'])
         del(result['modified'])
+        result.pop('event_id', None)
         expected.update(updated)
         expected['id'] = id
         self.assertEqual(result, expected)
@@ -95,6 +97,7 @@ class TestAlbums(test_base.TestBase):
         response = self.call_endpoint('/album/%s' % id, 'get')
         result = response.get_json()
         del(result['created'])
+        result.pop('event_id', None)
         expected['id'] = id
         expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
 
