@@ -19,7 +19,7 @@ from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 import constants
-from .example import aes_secret, Base
+from .base import aes_secret, Base
 
 
 class Album(Base):

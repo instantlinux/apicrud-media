@@ -9,7 +9,7 @@ from sqlalchemy import Column, Enum, ForeignKey, String, TEXT, TIMESTAMP
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, backref
 
-from .example import Base
+from .base import Base
 
 
 class Event(Base):

@@ -62,6 +62,7 @@ test: test_requirements py_requirements media/.proto.sqlite \
 	@echo "Running pytest unit tests"
 	cd media && \
 	(. $(VDIR)/bin/activate && \
+	 DB_SEED_FILE=$(PWD)/tests/db_fixture.yaml \
 	 PYTHONPATH=. python3 -m pytest $(XARGS) ../tests \
 	 --maxfail=$(MAXFAIL) \
 	 --durations=10 \
@@ -74,6 +75,7 @@ test: test_requirements py_requirements media/.proto.sqlite \
 
 media/.proto.sqlite:
 	@echo Generating prototype sqlite db
+	@echo **note** schema changes require a .schema dump from apicrud
 	sqlite3 $@ < tests/schema-cac2000912a5.sql
 
 media/i18n/en/LC_MESSAGES/messages.mo:

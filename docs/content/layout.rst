@@ -14,6 +14,11 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     │   ├── config.yaml          # application settings
     │   ├── constants.py         # global constants
     │   ├── main.py              # top-level startup
+    │   ├── models
+    │   │   ├── __init__.py      # models for database schema
+    │   │   ├── api.py           # open-core API models
+    │   │   ├── base.py          # declarative base
+    │   │   └── media.py         # open-core media models
     │   ├── models               # models for database schema
     │   ├── openapi.yaml         # OpenAPI 3.0 specifications
     │   ├── rbac.yaml            # endpoint permissions

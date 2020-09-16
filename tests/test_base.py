@@ -38,7 +38,9 @@ class TestBase(unittest.TestCase):
             subprocess.Popen(['cp', '.proto.sqlite', global_fixture['dbfile']])
             db_url = os.environ.get(
                 'DB_URL', 'sqlite:///%s' % global_fixture['dbfile'])
-            global_fixture['config'] = ServiceConfig(db_url=db_url).config
+            global_fixture['config'] = ServiceConfig(
+                db_url=db_url, db_seed_file=os.path.join(os.path.dirname(
+                    __file__), 'db_seed.yaml')).config
             global_fixture['flask'] = global_fixture['app'].test_client()
             global_fixture['redis'] = fakeredis.FakeStrictRedis(
                 server=fakeredis.FakeServer())
@@ -46,6 +48,9 @@ class TestBase(unittest.TestCase):
             unittest.mock.patch(
                 'apicrud.service_registry.ServiceRegistry.update').start()
             setup_db(db_url=db_url, redis_conn=redis_conn)
+            db_session = database.get_session(db_url=db_url)
+            database.seed_new_db(db_session)
+            db_session.remove()
         yield global_fixture
         try:
             if os.environ.get('DBCLEAN', None) != '0':

@@ -26,7 +26,8 @@ class TestMain(test_base.TestBase):
             status='pass',
             version=_version.__version__)
         response = self.call_endpoint('/health', 'get')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200, 'unexpected result %s' %
+                         response.get_json().get('output'))
         self.assertEqual(response.get_json(), expected)
 
     def test_auth(self):
