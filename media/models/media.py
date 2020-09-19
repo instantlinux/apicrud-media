@@ -19,14 +19,15 @@ from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 import constants
-from .base import aes_secret, Base
+from .base import aes_secret, AsDictMixin, Base
 
 
-class Album(Base):
+class Album(AsDictMixin, Base):
     __tablename__ = 'albums'
     __table_args__ = (
         UniqueConstraint(u'name', u'uid', name='uniq_album_user'),
     )
+    __rest_related__ = ('pictures',)
 
     id = Column(String(16), primary_key=True, unique=True)
     name = Column(String(64), nullable=False)
@@ -54,12 +55,6 @@ class Album(Base):
     owner = relationship('Person', foreign_keys=[uid], backref=backref(
         'album_uid', cascade='all, delete-orphan'))
 
-    def as_dict(self):
-        retval = {col.name: getattr(self, col.name)
-                  for col in self.__table__.columns}
-        retval['pictures'] = [picture.id for picture in self.pictures]
-        return retval
-
 
 class AlbumContent(Base):
     __tablename__ = 'albumcontents'
@@ -80,7 +75,7 @@ class AlbumContent(Base):
         'albumcontents', cascade='all, delete-orphan'))
 
 
-class File(Base):
+class File(AsDictMixin, Base):
     __tablename__ = 'files'
 
     id = Column(String(16), primary_key=True, unique=True)
@@ -103,10 +98,6 @@ class File(Base):
     storage = relationship('Storage')
     # TODO
     # list = relationship('List')
-
-    def as_dict(self):
-        return {col.name: getattr(self, col.name)
-                for col in self.__table__.columns}
 
 
 # see https://docs.sqlalchemy.org/en/13/orm/extensions/associationproxy.html
