@@ -9,10 +9,10 @@ from sqlalchemy import Column, Enum, ForeignKey, String, TEXT, TIMESTAMP
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, backref
 
-from .base import Base
+from .base import AsDictMixin, Base
 
 
-class Event(Base):
+class Event(AsDictMixin, Base):
     __tablename__ = 'events'
 
     id = Column(String(16), primary_key=True, unique=True)
@@ -29,7 +29,3 @@ class Event(Base):
     category = relationship('Category')
     owner = relationship('Person', foreign_keys=[uid], backref=backref(
         'event_uid', cascade='all, delete-orphan'))
-
-    def as_dict(self):
-        return {col.name: getattr(self, col.name)
-                for col in self.__table__.columns}
