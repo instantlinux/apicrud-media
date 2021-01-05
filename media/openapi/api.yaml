@@ -1,0 +1,79 @@
+openapi: 3.0.1
+info:
+  title: Apicrud media service
+  version: "0.1"
+  description: |
+    This is the media server for photos/videos and file attachments.
+servers:
+- url: http://localhost:8085/api/v1
+- url: http://localhost:32085/api/v1
+- url: https://media.example.com/api/v1
+
+components:
+  schemas:
+    base: &schema_base
+      $ref: 'base.schema.yaml#/base'
+    Album:
+      $ref: 'album.schema.yaml#/Album'
+    Auth:
+      $ref: 'account.schema.yaml#/Auth'
+    Health:
+      description: Health check
+      title: status
+      type: object
+    File:
+      $ref: 'file.schema.yaml#/File'
+    FileUploadPresign:
+      $ref: 'file.schema.yaml#/FileUploadPresign'
+    Picture:
+      $ref: 'picture.schema.yaml#/Picture'
+    Storage:
+      $ref: 'storage.schema.yaml#/Storage'
+
+  securitySchemes:
+    basic:
+      type: http
+      scheme: basic
+      x-basicInfoFunc: apicrud.session_auth.basic
+    apikey:
+      in: header
+      name: X-API-KEY
+      type: apiKey
+      x-apikeyInfoFunc: apicrud.session_auth.api_key
+
+paths:
+  /album:
+    $ref: 'album.path.yaml#/album'
+  /album/{id}:
+    $ref: 'album.path.yaml#/album-id'
+  /album/{ids}:
+    $ref: 'album.path.yaml#/album-ids'
+  /file:
+    $ref: 'file.path.yaml#/file'
+  /file/{id}:
+    $ref: 'file.path.yaml#/file-id'
+  /file/{ids}:    
+    $ref: 'file.path.yaml#/file-ids'
+  /file_upload_url:
+    $ref: 'file.path.yaml#/file_upload_url'
+  /upload_complete/{id}:
+    $ref: 'file.path.yaml#/upload_complete-id'
+  /health:
+    $ref: 'health.path.yaml#/health'
+  /picture:
+    $ref: 'picture.path.yaml#/picture'
+  /picture/{id}:    
+    $ref: 'picture.path.yaml#/picture-id'
+  /picture/{ids}:    
+    $ref: 'picture.path.yaml#/picture-ids'
+  /storage:
+    $ref: 'storage.path.yaml#/storage'
+  /storage/{id}:
+    $ref: 'storage.path.yaml#/storage-id'
+  /storage/{ids}:
+    $ref: 'storage.path.yaml#/storage-ids'
+  /auth:
+    $ref: 'account.path.yaml#/auth'
+  /logout:
+    $ref: 'account.path.yaml#/logout'
+    

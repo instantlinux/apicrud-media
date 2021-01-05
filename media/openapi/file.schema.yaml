@@ -1,0 +1,138 @@
+File:
+  description: A file
+  example:
+    bucket: attachments
+    name: document.pdf
+    privacy: public
+    size: 3521
+  properties:
+    created:
+      $ref: '#/components/schemas/base/properties/created'
+    event_id:
+      $ref: '#/components/schemas/base/properties/id'
+      nullable: true
+    id:
+      $ref: '#/components/schemas/base/properties/id'
+    mime_type:
+      default: text/plain
+      description: Type of file
+      maxLength: 32
+      minLength: 2
+      type: string
+    modified:
+      $ref: '#/components/schemas/base/properties/modified'
+    name:
+      maxLength: 64
+      minLength: 2
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF _.-]+$
+      type: string
+    owner:
+      maxLength: 32
+      minLength: 4
+      pattern: ^[a-z0-9@_.-]+$
+      readOnly: true
+      type: string
+    path:
+      maxLength: 64
+      minLength: 2
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF/_.-]+$
+      type: string
+    privacy:
+      $ref: '#/components/schemas/Storage/properties/privacy'
+    sha1:
+      description: Sha1 checksum
+      readOnly: true
+      type: string
+    sha256:
+      description: Sha256 checksum
+      readOnly: true
+      type: string
+    size:
+      description: Size of the file
+      minimum: 0
+      type: integer
+    status:
+      $ref: '#/components/schemas/base/properties/status'
+    storage_id:
+      $ref: '#/components/schemas/base/properties/id'
+    uid:
+      $ref: '#/components/schemas/base/properties/id'
+  required:
+  - name
+  title: a file
+  type: object
+  xml:
+    name: File
+FileUploadPresign:
+  description: An upload presigning request
+  properties:
+    content_type:
+      default: binary/octet-stream
+      description: Content type
+      enum:
+      - binary/octet-stream
+      - image/gif
+      - image/heic
+      - image/jpeg
+      - image/png
+      - image/svg
+      - text/plain
+      - text/html
+      - video/mpeg
+      - video/mp4
+      type: string
+    duration:
+      description: Duration of video content
+      maximum: 7200.0
+      minimum: 0.0
+      nullable: true
+      type: number
+    height:
+      description: Pixel height of content
+      maximum: 32768
+      minimum: 50
+      nullable: true
+      type: integer
+    name:
+      description: Name of file to be uploaded
+      maxLength: 64
+      minLength: 1
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF _:@#$~+=<>().-]+$
+      type: string
+    parent_id:
+      $ref: '#/components/schemas/base/properties/id'
+      description: ID of parent resource
+    parent_type:
+      default: album
+      description: Parent resource type
+      enum:
+      - album
+      - list
+      - message
+      type: string
+    size:
+      description: Size of file to be uploaded
+      maximum: 31457280
+      minimum: 0
+      type: integer
+    storage_id:
+      $ref: '#/components/schemas/base/properties/id'
+      description: ID of storage volume
+    ttl:
+      description: Expiration time of presigned token
+      maximum: 259200
+      minimum: 10
+      type: integer
+    width:
+      description: Pixel width of content
+      maximum: 32768
+      minimum: 50
+      nullable: true
+      type: integer
+  required:
+  - name
+  - storage_id
+  title: a presigning request
+  type: object
+  xml:
+    name: FileUploadPresign

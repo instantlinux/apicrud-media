@@ -1,0 +1,187 @@
+picture:
+  get:
+    description: Find pictures based on conditions
+    operationId: find
+    parameters:
+    - description: Picture ID
+      in: query
+      name: id
+      schema:
+        $ref: '#/components/schemas/base/properties/id'
+    - description: Picture's caption
+      in: query
+      name: caption
+      schema:
+        $ref: '#/components/schemas/Picture/properties/caption'
+    - description: Status
+      in: query
+      name: status
+      schema:
+        $ref: '#/components/schemas/base/properties/status'
+    - description: Maximum records to fetch
+      in: query
+      name: limit
+      schema:
+        maximum: 10000
+        minimum: 0
+        type: integer
+    - description: Record offset for pagination
+      in: query
+      name: offset
+      schema:
+        maximum: 2147483647
+        minimum: 0
+        type: integer
+    - description: Sort-by field
+      in: query
+      name: sort
+      schema:
+        maxLength: 20
+        type: string
+    - description: Sort-order field
+      in: query
+      name: order
+      schema:
+        enum:
+        - asc
+        - desc
+        type: string
+    - description: Filter field
+      in: query
+      name: filter
+      schema:
+        maxLength: 2048
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Picture'
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid conditions supplied
+      404:
+        content: {}
+        description: picture not found
+    security:
+    - basic: []
+    summary: Find pictures by conditions
+    tags:
+    - picture
+    x-openapi-router-controller: controllers.picture.PictureController
+  post:
+    operationId: create
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Picture'
+      description: Create a new picture
+      required: true
+    responses:
+      405:
+        content: {}
+        description: Invalid input
+    security:
+    - basic: []
+    summary: Create a new picture
+    tags:
+    - picture
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.picture.PictureController
+picture-ids:
+  delete:
+    operationId: delete
+    parameters:
+    - description: picture ids to delete
+      in: path
+      name: ids
+      required: true
+      schema:
+        items:
+          maxLength: 10
+          minLength: 10
+          type: string
+        type: array
+    - description: force-delete instead of disable
+      in: query
+      name: force
+      schema:
+        default: false
+        type: boolean
+    responses:
+      400:
+        content: {}
+        description: Invalid id value
+    security:
+    - basic: []
+    summary: Deletes one or more pictures
+    tags:
+    - picture
+    x-openapi-router-controller: controllers.picture.PictureController
+picture-id:
+  get:
+    description: Returns a single picture
+    operationId: get
+    parameters:
+    - description: ID of picture to return
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Picture'
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid ID supplied
+      404:
+        content: {}
+        description: picture not found
+    security:
+    - basic: []
+    summary: Find picture by ID
+    tags:
+    - picture
+    x-openapi-router-controller: controllers.picture.PictureController
+  put:
+    operationId: update
+    parameters:
+    - description: picture to modify
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Picture'
+      description: Update a picture
+      required: true
+    responses:
+      404:
+        content: {}
+        description: picture not found
+      405:
+        content: {}
+        description: Validation exception
+    security:
+    - basic: []
+    summary: Update an existing picture
+    tags:
+    - picture
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.picture.PictureController

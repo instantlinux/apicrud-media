@@ -1,0 +1,39 @@
+base:
+  properties:
+    category_id:
+      type: string
+      minLength: 10
+      maxLength: 10
+    created:
+      type: string
+      format: date-time
+      readOnly: true
+    id:
+      type: string
+      minLength: 10
+      maxLength: 10
+    modified:
+      type: string
+      format: date-time
+      readOnly: true
+    owner:
+      type: string
+      minLength: 4
+      maxLength: 32
+      pattern: ^[a-z0-9@_.-]+$
+      readOnly: true
+    privacy:
+      enum:
+      - public
+      - invitee
+      - member
+      - manager
+      - secret
+      type: string
+    status:
+      description: Status
+      enum:
+      - active
+      - disabled
+      type: string
+  type: object

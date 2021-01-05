@@ -1,0 +1,22 @@
+Auth:
+  description: Authenticate
+  example:
+    username: fsmith
+    password: mysecret
+  properties:
+    username:
+      description: A user's login name
+      maxLength: 32
+      minLength: 4
+      pattern: ^[a-z0-9@_.-]+$
+      type: string
+    password:
+      description: >
+        Password, use at least 3 of the following types of characters:
+        (a) uppercase letters, (b) lowercase letters, (c) numbers, and/or
+        (d) punctuation
+      type: string
+      minLength: 8
+      maxLength: 64
+      format: password
+  type: object

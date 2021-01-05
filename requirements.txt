@@ -8,15 +8,16 @@ jsonschema==3.2.0
 Pillow==7.1.2
 requests==2.23.0
 
-apicrud==0.0.44
-b2sdk==1.1.4
+apicrud==0.0.48
+b2sdk==1.2.0
 celery==4.4.7
 connexion==2.7.0
 connexion[swagger-ui]
 # unpinned, to use system package
 cryptography
+dollar-ref==0.1.3
 Flask-Cors==3.0.9
-SQLAlchemy==1.3.19
+SQLAlchemy==1.3.22
 SQLAlchemy-Utils==0.36.8
 swagger-ui-bundle==0.0.8
 
@@ -41,18 +42,18 @@ logfury==0.1.2
 Mako==1.1.3
 MarkupSafe==1.1.1
 openapi-spec-validator==0.2.9
-passlib==1.7.2
+passlib==1.7.4
 PyJWT==1.7.1
 PyMySQL==0.10.1
 pyrsistent==0.17.3
 python-dateutil==2.8.1
 python-editor==1.0.4
-pytz==2020.1
+pytz==2020.5
 PyYAML==5.3.1
 ratelim==0.1.6
 redis==3.5.3
 s3transfer==0.3.3
-tqdm==4.49.0
+tqdm==4.55.0
 urllib3==1.25.9
 vine==1.3.0
 Werkzeug==1.0.1

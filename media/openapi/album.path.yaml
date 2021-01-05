@@ -1,0 +1,200 @@
+album:
+  get:
+    description: Find albums based on conditions
+    operationId: find
+    parameters:
+    - description: Album ID
+      in: query
+      name: id
+      schema:
+        $ref: '#/components/schemas/base/properties/id'
+    - description: Album name
+      in: query
+      name: name
+      schema:
+        $ref: '#/components/schemas/Album/properties/name'
+    - description: Status
+      in: query
+      name: status
+      schema:
+        $ref: '#/components/schemas/base/properties/status'
+    - description: Maximum records to fetch
+      in: query
+      name: limit
+      schema:
+        maximum: 10000
+        minimum: 0
+        type: integer
+    - description: Record offset for pagination
+      in: query
+      name: offset
+      schema:
+        maximum: 2147483647
+        minimum: 0
+        type: integer
+    - description: Sort-by field
+      in: query
+      name: sort
+      schema:
+        maxLength: 20
+        type: string
+    - description: Sort-order field
+      in: query
+      name: order
+      schema:
+        enum:
+        - asc
+        - desc
+        type: string
+    - description: Filter field
+      in: query
+      name: filter
+      schema:
+        maxLength: 2048
+        type: string
+    - description: Pagination token
+      in: query
+      name: cursor_next
+      schema:
+        format: b64string
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/Album'
+                type: array
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid conditions supplied
+      404:
+        content: {}
+        description: album not found
+    security:
+    - basic: []
+    summary: Find albums by conditions
+    tags:
+    - album
+    x-codegen-request-body-name: conditions
+    x-openapi-router-controller: controllers.album.AlbumController
+  post:
+    operationId: create
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Album'
+      required: true
+    responses:
+      405:
+        content: {}
+        description: Invalid input
+    security:
+    - basic: []
+    summary: Create a new album
+    tags:
+    - album
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.album.AlbumController
+album-ids:
+  delete:
+    operationId: delete
+    parameters:
+    - description: album ids to delete
+      in: path
+      name: ids
+      required: true
+      schema:
+        items:
+          maxLength: 10
+          minLength: 10
+          type: string
+        type: array
+    - description: force-delete instead of disable
+      in: query
+      name: force
+      schema:
+        default: false
+        type: boolean
+    responses:
+      400:
+        content: {}
+        description: Invalid id value
+    security:
+    - basic: []
+    summary: Delete one or more albums
+    tags:
+    - album
+    x-openapi-router-controller: controllers.album.AlbumController
+album-id:
+  get:
+    description: Returns a single album
+    operationId: get
+    parameters:
+    - description: ID of album to return
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    - description: Fetch details for gallery display
+      in: query
+      name: details
+      schema:
+        default: false
+        type: boolean
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Album'
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid ID supplied
+      404:
+        content: {}
+        description: album not found
+    security:
+    - basic: []
+    summary: Find album by ID
+    tags:
+    - album
+    x-openapi-router-controller: controllers.album.AlbumController
+  put:
+    operationId: update
+    parameters:
+    - description: album to modify
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Album'
+      required: true
+    responses:
+      404:
+        content: {}
+        description: album not found
+      405:
+        content: {}
+        description: Validation exception
+    security:
+    - basic: []
+    summary: Update an existing album
+    tags:
+    - album
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.album.AlbumController

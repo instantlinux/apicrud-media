@@ -42,9 +42,20 @@ $(VDIR)/bin/python3:
 	@echo "Creating virtual environment"
 	python3 -m venv --system-site-packages $(VENV)
 
+media/openapi.yaml: $(wildcard media/openapi/*.yaml)
+	@echo "Generating openapi.yaml"
+	. $(VDIR)/bin/activate && dref media/openapi/api.yaml $@
+
 flake8: test_requirements
 	@echo "Running flake8 code analysis"
 	. $(VDIR)/bin/activate && flake8 media tests
+
+# for the create_image rule, do this instead for openapi.yaml
+openapi_deploy:
+	pip install dollar-ref
+	ls -l $(find . -name dref)
+	/build/.local/bin/dref media/openapi/api.yaml media/openapi.yaml
+	chmod 644 media/openapi.yaml
 
 $(VDIR)/lib/python3.6/site-packages/pytest.py: python_env
 	@echo "Installing test requirements"
@@ -58,7 +69,7 @@ py_requirements: $(VDIR)/lib/python3.6/site-packages/flask/app.py
 test_requirements: $(VDIR)/lib/python3.6/site-packages/pytest.py
 
 test: test_requirements py_requirements media/.proto.sqlite \
-	    media/i18n/en/LC_MESSAGES/messages.mo
+	    media/i18n/en/LC_MESSAGES/messages.mo media/openapi.yaml
 	@echo "Running pytest unit tests"
 	cd media && \
 	(. $(VDIR)/bin/activate && \
@@ -84,12 +95,12 @@ media/i18n/en/LC_MESSAGES/messages.mo:
 clean:
 	rm -rf build dist *.egg-info .cache .pytest_cache */__pycache__ \
 	 */.coverage */.proto.sqlite */coverage.xml */htmlcov */results.xml \
-	 docs/_build docs/content/stubs
+	 docs/_build docs/content/stubs media/openapi.yaml
 	find . -name '*.pyc' -or -name '*~' -exec rm -rf {} \;
 wipe_clean: clean
 	rm -rf python_env
 
-create_image: qemu i18n_deploy
+create_image: qemu i18n_deploy openapi_deploy
 	@echo docker build -t $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG)
 	@docker buildx build \
 	 --tag $(REGISTRY)/$(IMGNAME)-$(CI_JOB_NAME):$(TAG) . \
@@ -98,7 +109,7 @@ create_image: qemu i18n_deploy
 	 --build-arg=TAG=$(TAG) \
 	 --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ)
 
-promote_images: qemu i18n_deploy
+promote_images: qemu i18n_deploy openapi_deploy
 ifeq ($(CI_COMMIT_TAG),)
 	$(foreach target, $(IMAGES), \
 	  image=$(shell basename $(target)) && \

@@ -12,7 +12,7 @@ from flask_babel import Babel
 import os
 
 from apicrud import AccessControl, AccountSettings, ServiceConfig, \
-    ServiceRegistry, SessionManager, database, utils
+    ServiceRegistry, SessionManager, database, initialize
 
 import controllers
 import models
@@ -22,7 +22,7 @@ path = os.path.dirname(os.path.abspath(__file__))
 config = ServiceConfig(
     babel_translation_directories='i18n;%s' % os.path.join(path, 'i18n'),
     reset=True, file=os.path.join(path, 'config.yaml'), models=models).config
-utils.initialize_app(application)
+initialize.app(application)
 babel = Babel(application.app)
 
 

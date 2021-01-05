@@ -38,9 +38,9 @@ def incoming(uid, file_id):
     logging.info("action=incoming uid=%s name=%s file_id=%s " % (
         uid, media.meta["name"], file_id))
     if media.meta["ctype"] in constants.MIME_IMAGE_TYPES:
-        media.photo(uid, media.meta, db_session)
+        media.photo(uid, media.meta)
     elif media.meta["ctype"] in constants.MIME_VIDEO_TYPES:
-        media.video(uid, media.meta, db_session)
+        media.video(uid, media.meta)
     else:
         # TODO heic will require another library
         #  https://stackoverflow.com/questions/54395735/how-to-work-with-heic-image-file-types-in-python

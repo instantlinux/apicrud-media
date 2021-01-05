@@ -1,0 +1,123 @@
+Picture:
+  description: A shared picture
+  properties:
+    album_id:
+      $ref: '#/components/schemas/base/properties/id'
+      nullable: true
+    caption:
+      maxLength: 255
+      minLength: 4
+      nullable: true
+      type: string
+    compression:
+      readOnly: true
+      type: string
+    created:
+      $ref: '#/components/schemas/base/properties/created'
+    datetime_original:
+      format: date-time
+      readOnly: true
+      type: string
+    format_original:
+      enum:
+      - bmp
+      - gif
+      - heic
+      - heif
+      - ico
+      - jpeg
+      - mov
+      - mp4
+      - png
+      - svg
+      - wmv
+      type: string
+    geo:
+      items:
+        maximum: 180.0
+        minimum: -180.0
+        type: number
+      maxItems: 2
+      readOnly: true
+      type: array
+    gps_altitude:
+      maximum: 180.0
+      minimum: -180.0
+      readOnly: true
+      type: number
+    height:
+      readOnly: true
+      type: integer
+    id:
+      $ref: '#/components/schemas/base/properties/id'
+    is_encrypted:
+      default: false
+      description: Encrypted at rest
+      readOnly: true
+      type: boolean
+    make:
+      readOnly: true
+      type: string
+    model:
+      readOnly: true
+      type: string
+    modified:
+      $ref: '#/components/schemas/base/properties/modified'
+    name:
+      maxLength: 64
+      minLength: 2
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF _.-]+$
+      type: string
+    orientation:
+      readOnly: true
+      type: integer
+    owner:
+      $ref: '#/components/schemas/File/properties/owner'
+      readOnly: true
+    path:
+      maxLength: 64
+      minLength: 2
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF/_.-]+$
+      type: string
+    privacy:
+      $ref: '#/components/schemas/Storage/properties/privacy'
+    rank:
+      maximum: 10000
+      minimum: 1
+      nullable: true
+      type: number
+    sha1:
+      description: Sha1 checksum
+      readOnly: true
+      type: string
+    sha256:
+      description: Sha256 checksum
+      readOnly: true
+      type: string
+    size:
+      minimum: 0
+      type: integer
+    status:
+      $ref: '#/components/schemas/base/properties/status'
+    storage_id:
+      $ref: '#/components/schemas/base/properties/id'
+    thumbnail50x50:
+      format: binary
+      readOnly: true
+      type: image/*
+    uid:
+      $ref: '#/components/schemas/base/properties/id'
+    upload_url:
+      format: url
+      maxLength: 128
+      minLength: 2
+      type: string
+    width:
+      readOnly: true
+      type: integer
+  required:
+  - name
+  - size
+  - storage_id
+  title: a picture
+  type: object

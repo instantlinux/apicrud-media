@@ -4,3 +4,4 @@ appname: Media
 db_migrate_enable: false
 db_schema_maxtime: 0
 service_name: media
+thumbnail_tiny: 50

@@ -20,7 +20,11 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     │   │   ├── base.py          # declarative base
     │   │   └── media.py         # open-core media models
     │   ├── models               # models for database schema
-    │   ├── openapi.yaml         # OpenAPI 3.0 specifications
+    │   ├── openapi              # OpenAPI 3.0 specifications
+    │   │   ├── api.yaml         # top-level API spec
+    │   │   ├── album.schema.yaml  # open-core API model schema
+    │   │   ├── album.path.yaml    # open-core API routing paths
+    │   │   └── ...              # add your custom specs here
     │   ├── rbac.yaml            # endpoint permissions
     │   ├── _version.py          # application version
     │   └── controllers          # controller classes

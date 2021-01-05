@@ -1,0 +1,62 @@
+Storage:
+  description: A storage volume
+  example:
+    name: photos
+    privacy: public
+  properties:
+    api_url:
+      description: URL of service API, if required
+      format: url
+      maxLength: 64
+      nullable: true
+      type: string
+    bucket:
+      description: Bucket name
+      maxLength: 64
+      minLength: 2
+      type: string
+    created:
+      $ref: '#/components/schemas/base/properties/created'
+    credentials_id:
+      $ref: '#/components/schemas/base/properties/id'
+    id:
+      $ref: '#/components/schemas/base/properties/id'
+    identifier:
+      description: Identifier assigned by vendor
+      maxLength: 64
+      nullable: true
+      type: string
+    modified:
+      $ref: '#/components/schemas/base/properties/modified'
+    name:
+      maxLength: 32
+      minLength: 2
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF _&.-]+$
+      type: string
+    owner:
+      maxLength: 32
+      minLength: 4
+      pattern: ^[a-z0-9@_.-]+$
+      readOnly: true
+      type: string
+    prefix:
+      maxLength: 128
+      nullable: true
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF @#~_/.=^+-]*$
+      type: string
+    privacy:
+      enum:
+      - public
+      - invitee
+      - member
+      - manager
+      - secret
+      type: string
+    status:
+      $ref: '#/components/schemas/base/properties/status'
+  required:
+  - name
+  title: a storage volume
+  type: object
+  xml:
+    name: Storage

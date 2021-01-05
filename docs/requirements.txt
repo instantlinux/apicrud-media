@@ -1,20 +1,20 @@
 autodoc==0.5.0
-pymdown-extensions==7.1
-Sphinx==3.1.1
-sphinxcontrib-mermaid==0.4.0
-sphinx-markdown-parser==0.2.3
+pymdown-extensions==8.1
+Sphinx==3.4.1
+sphinxcontrib-mermaid==0.5.0
+sphinx-markdown-parser==0.2.4
 sphinx-markdown-tables==0.0.15
-sphinx-rtd-theme==0.5.0
+sphinx-rtd-theme==0.5.1
 
 -r ../requirements.txt
 
 # transitive dependencies
 alabaster==0.7.12
-attrs==19.3.0
+attrs==20.3.0
 Babel==2.8.0
-beautifulsoup4==4.9.1
-certifi==2020.6.20
-cffi==1.14.0
+beautifulsoup4==4.9.3
+certifi==2020.12.5
+cffi==1.14.4
 chardet==3.0.4
 click==7.1.2
 commonmark==0.9.1
@@ -22,12 +22,12 @@ idna==2.10
 imagesize==1.2.0
 itsdangerous==1.1.0
 jsonschema==3.2.0
-Markdown==3.2.2
-packaging==20.4
+Markdown==3.3.3
+packaging==20.8
 pycparser==2.20
 pycryptodomex==3.9.8
-pydash==4.8.0
-Pygments==2.6.1
+pydash==4.9.2
+Pygments==2.7.3
 pyparsing==2.4.7
 requests==2.23.0
 six==1.15.0

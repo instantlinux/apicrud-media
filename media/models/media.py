@@ -15,8 +15,8 @@ from sqlalchemy import BIGINT, LargeBinary, BOOLEAN, BLOB, Column, Enum, \
      UniqueConstraint
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy_utils import EncryptedType
-from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine, \
+    StringEncryptedType
 
 import constants
 from .base import aes_secret, AsDictMixin, Base
@@ -34,7 +34,8 @@ class Album(AsDictMixin, Base):
     sizes = Column(String(32), nullable=False,
                    server_default=constants.DEFAULT_THUMBNAIL_SIZES)
     encryption = Column(Enum(u'aes'))
-    password = Column(EncryptedType(Unicode, aes_secret, AesEngine, 'pkcs5'))
+    password = Column(StringEncryptedType(Unicode, aes_secret, AesEngine,
+                                          'pkcs5', length=64))
     uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'), nullable=False)
     list_id = Column(ForeignKey(u'lists.id'))
     event_id = Column(ForeignKey(u'events.id'))

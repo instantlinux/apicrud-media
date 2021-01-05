@@ -1,0 +1,194 @@
+storage:
+  get:
+    description: Find storage volumes based on conditions
+    operationId: find
+    parameters:
+    - description: Storage ID
+      in: query
+      name: id
+      schema:
+        $ref: '#/components/schemas/base/properties/id'
+    - description: Storage volume name
+      in: query
+      name: name
+      schema:
+        $ref: '#/components/schemas/Storage/properties/name'
+    - description: Status
+      in: query
+      name: status
+      schema:
+        $ref: '#/components/schemas/base/properties/status'
+    - description: Maximum records to fetch
+      in: query
+      name: limit
+      schema:
+        maximum: 10000
+        minimum: 0
+        type: integer
+    - description: Record offset for pagination
+      in: query
+      name: offset
+      schema:
+        maximum: 2147483647
+        minimum: 0
+        type: integer
+    - description: Sort-by field
+      in: query
+      name: sort
+      schema:
+        maxLength: 20
+        type: string
+    - description: Sort-order field
+      in: query
+      name: order
+      schema:
+        enum:
+        - asc
+        - desc
+        type: string
+    - description: Filter field
+      in: query
+      name: filter
+      schema:
+        maxLength: 2048
+        type: string
+    - description: Pagination token
+      in: query
+      name: cursor_next
+      schema:
+        format: b64string
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/Storage'
+                type: array
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid conditions supplied
+      404:
+        content: {}
+        description: storage volume not found
+    security:
+    - basic: []
+    summary: Find storage volumes by conditions
+    tags:
+    - storage
+    x-codegen-request-body-name: conditions
+    x-openapi-router-controller: controllers.storage.StorageController
+  post:
+    operationId: create
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Storage'
+      required: true
+    responses:
+      405:
+        content: {}
+        description: Invalid input
+    security:
+    - basic: []
+    summary: Create a new storage volume
+    tags:
+    - storage
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.storage.StorageController
+storage-ids:
+  delete:
+    operationId: delete
+    parameters:
+    - description: storage volume ids to delete
+      in: path
+      name: ids
+      required: true
+      schema:
+        items:
+          maxLength: 10
+          minLength: 10
+          type: string
+        type: array
+    - description: force-delete instead of disable
+      in: query
+      name: force
+      schema:
+        default: false
+        type: boolean
+    responses:
+      400:
+        content: {}
+        description: Invalid id value
+    security:
+    - basic: []
+    summary: Delete one or more storage volumes
+    tags:
+    - storage
+    x-openapi-router-controller: controllers.storage.StorageController
+storage-id:
+  get:
+    description: Returns a single storage volume
+    operationId: get
+    parameters:
+    - description: ID of storage volume to return
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Storage'
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid ID supplied
+      404:
+        content: {}
+        description: storage volume not found
+    security:
+    - basic: []
+    summary: Find storage volume by ID
+    tags:
+    - storage
+    x-openapi-router-controller: controllers.storage.StorageController
+  put:
+    operationId: update
+    parameters:
+    - description: storage volume to modify
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Storage'
+      required: true
+    responses:
+      404:
+        content: {}
+        description: storage volume not found
+      405:
+        content: {}
+        description: Validation exception
+    security:
+    - basic: []
+    summary: Update an existing storage volume
+    tags:
+    - storage
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.storage.StorageController

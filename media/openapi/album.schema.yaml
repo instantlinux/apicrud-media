@@ -1,0 +1,63 @@
+Album:
+  description: A media album
+  properties:
+    id:
+      $ref: '#/components/schemas/base/properties/id'
+    name:
+      type: string
+      minLength: 2
+      maxLength: 64
+      pattern: ^[a-zA-Z0-9\u00C0-\u00FF @_.-]+$
+    sizes:
+      description: Vertical thumbnail sizes to store
+      items:
+        type: integer
+        minimum: 10
+        maximum: 8192
+      type: array
+      default:
+      - 120
+      - 1024
+    encryption:
+      description: Encryption type, default None
+      enum:
+      - aes
+      type: string
+      nullable: true
+    password:
+      description: Encryption passphrase
+      type: string
+      minLength: 8
+      maxLength: 64
+      format: password
+      nullable: true
+    cover_id:
+      description: ID of cover photo
+      $ref: '#/components/schemas/base/properties/id'
+      nullable: true
+    event_id:
+      description: ID of event
+      $ref: '#/components/schemas/base/properties/id'
+      nullable: true
+    list_id:
+      description: ID of list
+      $ref: '#/components/schemas/base/properties/id'
+      nullable: true
+    uid:
+      $ref: '#/components/schemas/base/properties/id'
+    category_id:
+      type: string
+      minLength: 10
+      maxLength: 10
+    privacy:
+      $ref: '#/components/schemas/base/properties/privacy'
+      # default: invitee
+    owner:
+      $ref: '#/components/schemas/base/properties/owner'
+      readOnly: true
+  required:
+  - name
+  title: a media album
+  type: object
+  xml:
+    name: Album

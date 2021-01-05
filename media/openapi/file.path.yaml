@@ -1,0 +1,241 @@
+file:
+  get:
+    description: Find files based on conditions
+    operationId: find
+    parameters:
+    - description: File ID
+      in: query
+      name: id
+      schema:
+        $ref: '#/components/schemas/base/properties/id'
+    - description: File name
+      in: query
+      name: name
+      schema:
+        $ref: '#/components/schemas/File/properties/name'
+    - description: Status
+      in: query
+      name: status
+      schema:
+        $ref: '#/components/schemas/base/properties/status'
+    - description: Maximum records to fetch
+      in: query
+      name: limit
+      schema:
+        maximum: 10000
+        minimum: 0
+        type: integer
+    - description: Record offset for pagination
+      in: query
+      name: offset
+      schema:
+        maximum: 2147483647
+        minimum: 0
+        type: integer
+    - description: Sort-by field
+      in: query
+      name: sort
+      schema:
+        maxLength: 20
+        type: string
+    - description: Sort-order field
+      in: query
+      name: order
+      schema:
+        enum:
+        - asc
+        - desc
+        type: string
+    - description: Filter field
+      in: query
+      name: filter
+      schema:
+        maxLength: 2048
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid conditions supplied
+      404:
+        content: {}
+        description: file not found
+    security:
+    - basic: []
+    summary: Find files by conditions
+    tags:
+    - file
+    x-openapi-router-controller: controllers.file.FileController
+  post:
+    operationId: create
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/File'
+      description: Create a new file
+      required: true
+    responses:
+      405:
+        content: {}
+        description: Invalid input
+    security:
+    - basic: []
+    summary: Create a new file
+    tags:
+    - file
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.file.FileController
+file-ids:
+  delete:
+    operationId: delete
+    parameters:
+    - description: file ids to delete
+      in: path
+      name: ids
+      required: true
+      schema:
+        items:
+          maxLength: 10
+          minLength: 10
+          type: string
+        type: array
+    - description: force-delete instead of disable
+      in: query
+      name: force
+      schema:
+        default: false
+        type: boolean
+    responses:
+      400:
+        content: {}
+        description: Invalid id value
+    security:
+    - basic: []
+    summary: Deletes one or more files
+    tags:
+    - file
+    x-openapi-router-controller: controllers.file.FileController
+file-id:
+  get:
+    description: Returns a single file
+    operationId: get
+    parameters:
+    - description: ID of file to return
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+        description: successful operation
+      400:
+        content: {}
+        description: Invalid ID supplied
+      404:
+        content: {}
+        description: file not found
+    security:
+    - basic: []
+    summary: Find file by ID
+    tags:
+    - file
+    x-openapi-router-controller: controllers.file.FileController
+  put:
+    operationId: update
+    parameters:
+    - description: file to modify
+      in: path
+      name: id
+      required: true
+      schema:
+        maxLength: 10
+        minLength: 10
+        type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/File'
+      description: Update a file
+      required: true
+    responses:
+      404:
+        content: {}
+        description: file not found
+      405:
+        content: {}
+        description: Validation exception
+    security:
+    - basic: []
+    summary: Update an existing file
+    tags:
+    - file
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.file.FileController
+file_upload_url:
+  post:
+    operationId: file_upload_url
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FileUploadPresign'
+      description: Request presigned URL for file upload
+      required: true
+    responses:
+      404:
+        content: {}
+        description: storage volume not found
+      405:
+        content: {}
+        description: Validation exception
+    summary: generate a presigned url for upload
+    tags:
+    - file
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.file.FileController
+upload_complete-id:
+  post:
+    operationId: upload_complete
+    parameters:
+    - description: ID of new file
+      in: path
+      name: id
+      schema:
+        $ref: '#/components/schemas/base/properties/id'
+    - description: status of upload
+      in: query
+      name: status
+      schema:
+        enum:
+        - aborted
+        - done
+        - error_upload
+        type: string
+    responses:
+      201:
+        description: processing started
+      404:
+        content: {}
+        description: id not found
+      405:
+        content: {}
+        description: Validation exception
+    summary: process uploaded file
+    tags:
+    - file
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.file.FileController

@@ -1,0 +1,32 @@
+auth:
+  post:
+    summary: Authenticate
+    operationId: login
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Auth'
+      required: true
+    responses:
+      405:
+        content: {}
+        description: Invalid input
+    tags:
+    - auth
+    x-codegen-request-body-name: body
+    x-openapi-router-controller: controllers.auth.AuthController
+logout:
+  get:
+    summary: Log out
+    operationId: logout
+    responses:
+      200:
+        content: {}
+        description: Logged out
+      405:
+        content: {}
+        description: Invalid input
+    tags:
+    - auth
+    x-openapi-router-controller: controllers.auth.AuthController
