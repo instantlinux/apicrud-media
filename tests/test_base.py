@@ -22,7 +22,7 @@ from apicrud import database
 from apicrud.service_config import ServiceConfig
 from apicrud.session_manager import SessionManager
 from main import application, setup_db
-from models import Account, Category, Contact, Person, Storage
+from models import Account, Category, Contact, Credential, Person, Storage
 
 global_fixture = {}
 unittest.util._MAX_LENGTH = 2000
@@ -101,9 +101,15 @@ class TestBase(unittest.TestCase):
         record = Category(id=self.cat_id, uid=self.test_uid,
                           name='default')
         db_session.add(record)
+        cred_id = 'x-M2fe7E07'
+        record = Credential(name='s3test', vendor='aws', key='AKIAxxxx1234',
+                            secret='allyourbasearebelongtous', id=cred_id,
+                            uid=self.test_uid, settings_id=self.settings_id)
+        db_session.add(record)
         record = Storage(id=self.default_storage_id, name=self.bucket,
                          cdn_uri=('https://%s.s3.amazonaws.com' %
                                   self.bucket),
+                         credentials_id=cred_id,
                          bucket=self.bucket, uid=self.test_uid)
         db_session.add(record)
 
