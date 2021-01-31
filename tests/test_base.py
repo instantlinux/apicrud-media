@@ -21,8 +21,10 @@ import unittest.mock
 from apicrud import database
 from apicrud.service_config import ServiceConfig
 from apicrud.session_manager import SessionManager
+from apicrud.media.storage import StorageAPI
+
 from main import application, setup_db
-from models import Account, Category, Contact, Person, Storage
+from models import Account, Category, Contact, Credential, Person, Storage
 
 global_fixture = {}
 unittest.util._MAX_LENGTH = 2000
@@ -40,7 +42,7 @@ class TestBase(unittest.TestCase):
                 'DB_URL', 'sqlite:///%s' % global_fixture['dbfile'])
             global_fixture['config'] = ServiceConfig(
                 db_url=db_url, db_seed_file=os.path.join(os.path.dirname(
-                    __file__), 'db_seed.yaml')).config
+                    __file__), 'db_fixture.yaml')).config
             global_fixture['flask'] = global_fixture['app'].test_client()
             global_fixture['redis'] = fakeredis.FakeStrictRedis(
                 server=fakeredis.FakeServer())
@@ -76,6 +78,7 @@ class TestBase(unittest.TestCase):
 
         self.username = 'testr'
         self.password = 't0ps3crEt'
+        self.access_key_id = 'AKIAP0XS5P8E4XXX1234'
         self.account_id = 'x-TpP43xS9'
         self.bucket = 'apicrud-test'
         self.cat_id = 'x-Jiqag482'
@@ -100,11 +103,6 @@ class TestBase(unittest.TestCase):
         db_session.add(record)
         record = Category(id=self.cat_id, uid=self.test_uid,
                           name='default')
-        db_session.add(record)
-        record = Storage(id=self.default_storage_id, name=self.bucket,
-                         cdn_uri=('https://%s.s3.amazonaws.com' %
-                                  self.bucket),
-                         bucket=self.bucket, uid=self.test_uid)
         db_session.add(record)
 
         self.admin_name = 'testadmin'
@@ -141,6 +139,8 @@ class TestBase(unittest.TestCase):
             db_session.commit()
         except IntegrityError:
             db_session.rollback()
+        StorageAPI(db_session=db_session, redis_conn=self.redis,
+                   uid=self.test_uid)
         db_session.remove()
 
     def authorize(self, username=None, password=None, new_session=False):

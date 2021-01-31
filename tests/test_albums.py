@@ -77,6 +77,8 @@ class TestAlbums(test_base.TestBase):
                          response.get_json().get('message'))
     """
 
+    # TODO test get populated album with details=true
+
     def test_album_delete(self):
         record = dict(name='wedding cake', sizes=[
             int(x) for x in constants.DEFAULT_THUMBNAIL_SIZES.split(',')])

@@ -9,9 +9,9 @@ import celery
 import logging
 import os
 
-from apicrud import ServiceConfig, database
-from apicrud.media.worker_processing import MediaProcessing, \
-    MediaUploadException
+from apicrud import ServiceConfig
+from apicrud.exceptions import MediaUploadError
+from apicrud.media.worker_processing import MediaProcessing
 
 import celeryconfig
 import constants
@@ -32,19 +32,17 @@ def incoming(uid, file_id):
       uid (str): User ID
       file_id (str): ID of file
     """
-    db_session = database.get_session(scopefunc=celery.utils.threads.get_ident,
-                                      db_url=config.DB_URL)
-    media = MediaProcessing(uid, file_id, db_session=db_session)
+    media = MediaProcessing(uid, file_id)
     logging.info("action=incoming uid=%s name=%s file_id=%s " % (
         uid, media.meta["name"], file_id))
     if media.meta["ctype"] in constants.MIME_IMAGE_TYPES:
-        media.photo(uid, media.meta)
+        media.photo(media.meta)
     elif media.meta["ctype"] in constants.MIME_VIDEO_TYPES:
-        media.video(uid, media.meta)
+        media.video(media.meta)
     else:
         # TODO heic will require another library
         #  https://stackoverflow.com/questions/54395735/how-to-work-with-heic-image-file-types-in-python
-        raise MediaUploadException("Unknown type=%s" % media.meta["ctype"])
+        raise MediaUploadError("Unknown type=%s" % media.meta["ctype"])
 
     logging.info("action=incoming status=success uid=%s name=%s file_id=%s "
                  % (uid, media.meta["name"], file_id))

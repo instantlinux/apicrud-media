@@ -34,6 +34,24 @@ CREATE TABLE time_zone_name (
 	UNIQUE (name), 
 	CHECK (status IN ('active', 'disabled'))
 );
+CREATE TABLE apikeys (
+	id VARCHAR(16) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	uid VARCHAR(16) NOT NULL, 
+	prefix VARCHAR(8) NOT NULL, 
+	hashvalue VARCHAR(96) NOT NULL, 
+	expires TIMESTAMP, 
+	last_used TIMESTAMP, 
+	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	modified TIMESTAMP, 
+	status VARCHAR(8) DEFAULT 'active' NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(uid) REFERENCES people (id), 
+	UNIQUE (id), 
+	UNIQUE (prefix), 
+	CONSTRAINT uniq_apikey_owner UNIQUE (name, uid), 
+	CHECK (status IN ('active', 'disabled'))
+);
 CREATE TABLE categories (
 	id VARCHAR(16) NOT NULL, 
 	name VARCHAR(64) NOT NULL, 
@@ -106,13 +124,14 @@ CREATE TABLE locations (
 	UNIQUE (id), 
 	CHECK (status IN ('active', 'disabled'))
 );
-CREATE TABLE directmessages (
+CREATE TABLE IF NOT EXISTS "directmessages" (
 	message_id VARCHAR(16) NOT NULL, 
 	uid VARCHAR(16) NOT NULL, 
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
 	PRIMARY KEY (message_id, uid), 
-	FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE, 
-	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE
+	CONSTRAINT uniq_directmessage UNIQUE (message_id, uid), 
+	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
+	FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE
 );
 CREATE INDEX ix_directmessages_uid ON directmessages (uid);
 CREATE TABLE lists (
@@ -132,32 +151,56 @@ CREATE TABLE lists (
 	CONSTRAINT uniq_list_owner UNIQUE (name, uid), 
 	CHECK (status IN ('active', 'disabled'))
 );
-CREATE TABLE listmembers (
+CREATE TABLE IF NOT EXISTS "listmembers" (
 	uid VARCHAR(16) NOT NULL, 
 	list_id VARCHAR(16) NOT NULL, 
 	authorization VARCHAR(8) DEFAULT 'member' NOT NULL, 
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
 	PRIMARY KEY (uid, list_id), 
+	CONSTRAINT uniq_listmember UNIQUE (list_id, uid), 
 	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE, 
 	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE
 );
 CREATE INDEX ix_listmembers_list_id ON listmembers (list_id);
-CREATE TABLE listmessages (
+CREATE TABLE IF NOT EXISTS "listmessages" (
 	message_id VARCHAR(16) NOT NULL, 
 	list_id VARCHAR(16) NOT NULL, 
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
 	PRIMARY KEY (message_id, list_id), 
-	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE, 
-	FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE
+	CONSTRAINT uniq_listmessage UNIQUE (list_id, message_id), 
+	FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE, 
+	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE
 );
 CREATE INDEX ix_listmessages_list_id ON listmessages (list_id);
+CREATE TABLE scopes (
+	id VARCHAR(16) NOT NULL, 
+	name VARCHAR(32) NOT NULL, 
+	settings_id VARCHAR(16) NOT NULL, 
+	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	modified TIMESTAMP, 
+	status VARCHAR(8) DEFAULT 'active' NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (id), 
+	CONSTRAINT uniq_scope_name UNIQUE (name, settings_id), 
+	CHECK (status IN ('active', 'disabled'))
+);
+CREATE TABLE IF NOT EXISTS "apikeyscopes" (
+	apikey_id VARCHAR(16) NOT NULL, 
+	scope_id VARCHAR(16) NOT NULL, 
+	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (apikey_id, scope_id), 
+	CONSTRAINT uniq_apikeyscope UNIQUE (apikey_id, scope_id), 
+	FOREIGN KEY(scope_id) REFERENCES scopes (id) ON DELETE CASCADE, 
+	FOREIGN KEY(apikey_id) REFERENCES apikeys (id) ON DELETE CASCADE
+);
+CREATE INDEX ix_apikey_scope_id ON apikeyscopes (apikey_id);
 CREATE TABLE accounts (
 	id VARCHAR(16) NOT NULL, 
 	name VARCHAR(32) NOT NULL, 
 	uid VARCHAR(16) NOT NULL, 
-	password BLOB NOT NULL, 
+	password VARCHAR(128) NOT NULL, 
 	password_must_change BOOLEAN DEFAULT 0 NOT NULL, 
-	totp_secret BLOB, 
+	totp_secret VARCHAR(48), 
 	is_admin BOOLEAN DEFAULT 0 NOT NULL, 
 	settings_id VARCHAR(16) NOT NULL, 
 	last_login TIMESTAMP, 
@@ -184,8 +227,8 @@ CREATE TABLE credentials (
 	type VARCHAR(16), 
 	url VARCHAR(64), 
 	"key" VARCHAR(128), 
-	secret BLOB, 
-	otherdata BLOB, 
+	secret VARCHAR(128), 
+	otherdata VARCHAR(1024), 
 	expires TIMESTAMP, 
 	settings_id VARCHAR(16) NOT NULL, 
 	uid VARCHAR(16) NOT NULL, 
@@ -263,7 +306,7 @@ CREATE TABLE albums (
 	name VARCHAR(64) NOT NULL, 
 	sizes VARCHAR(32) DEFAULT '120,720' NOT NULL, 
 	encryption VARCHAR(3), 
-	password BLOB, 
+	password VARCHAR(64), 
 	uid VARCHAR(16) NOT NULL, 
 	list_id VARCHAR(16), 
 	event_id VARCHAR(16), 
@@ -301,10 +344,10 @@ CREATE TABLE IF NOT EXISTS "messages" (
 	PRIMARY KEY (id), 
 	CHECK (published IN (0, 1)), 
 	CONSTRAINT messages_fk1 FOREIGN KEY(album_id) REFERENCES albums (id), 
-	FOREIGN KEY(sender_id) REFERENCES people (id), 
-	FOREIGN KEY(recipient_id) REFERENCES people (id), 
 	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
-	UNIQUE (id)
+	UNIQUE (id), 
+	FOREIGN KEY(recipient_id) REFERENCES people (id), 
+	FOREIGN KEY(sender_id) REFERENCES people (id)
 );
 CREATE TABLE IF NOT EXISTS "profileitems" (
 	id VARCHAR(16) NOT NULL, 
@@ -321,10 +364,10 @@ CREATE TABLE IF NOT EXISTS "profileitems" (
 	PRIMARY KEY (id), 
 	CONSTRAINT uniq_itemuid UNIQUE (uid, item), 
 	CONSTRAINT albums_fk1 FOREIGN KEY(album_id) REFERENCES albums (id), 
-	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
+	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
 	FOREIGN KEY(location_id) REFERENCES locations (id), 
 	UNIQUE (id), 
-	FOREIGN KEY(uid) REFERENCES people (id)
+	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id)
 );
 CREATE TABLE albumcontents (
 	album_id VARCHAR(16) NOT NULL, 
@@ -390,11 +433,11 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	PRIMARY KEY (id), 
 	CONSTRAINT settings_fk1 FOREIGN KEY(smtp_credential_id) REFERENCES credentials (id), 
 	CONSTRAINT settings_fk2 FOREIGN KEY(default_storage_id) REFERENCES storageitems (id), 
-	FOREIGN KEY(administrator_id) REFERENCES people (id), 
 	FOREIGN KEY(default_hostlist_id) REFERENCES lists (id), 
+	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
+	FOREIGN KEY(administrator_id) REFERENCES people (id), 
 	UNIQUE (id), 
-	FOREIGN KEY(default_cat_id) REFERENCES categories (id), 
-	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id)
+	FOREIGN KEY(default_cat_id) REFERENCES categories (id)
 );
 CREATE TABLE events (
 	id VARCHAR(16) NOT NULL, 

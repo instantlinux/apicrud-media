@@ -50,3 +50,18 @@ location:
   category_id: x-3423ceaf
   uid: x-23450001
   status: active
+credential:
+- id: x-M2fe7E07
+  key: AKIAP0XS5P8E4XXX1234
+  name: s3test
+  vendor: aws
+  secret: allyourbasearebelongtous
+  settings_id: x-75023275
+  uid: u-B0miQweE
+storage:
+- id: x-RwgSVd5G
+  bucket: apicrud-test
+  cdn_uri: "https://apicrud-test.s3.amazonaws.com"
+  credentials_id: x-M2fe7E07
+  name: apicrud-test
+  uid: u-B0miQweE
