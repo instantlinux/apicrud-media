@@ -57,23 +57,23 @@ openapi_deploy:
 	/build/.local/bin/dref media/openapi/api.yaml media/openapi.yaml
 	chmod 644 media/openapi.yaml
 
-$(VDIR)/lib/python3.6/site-packages/pytest.py: python_env
+$(VDIR)/lib/python3.8/site-packages/pytest/__init__.py:
 	@echo "Installing test requirements"
 	(. $(VDIR)/bin/activate && pip3 freeze && \
 	 pip3 install -r tests/requirements.txt)
-$(VDIR)/lib/python3.6/site-packages/flask/app.py: python_env
+$(VDIR)/lib/python3.8/site-packages/flask/app.py:
 	@echo "Installing main requirements"
 	(. $(VDIR)/bin/activate && \
 	 pip3 install -r requirements.txt)
-py_requirements: $(VDIR)/lib/python3.6/site-packages/flask/app.py
-test_requirements: $(VDIR)/lib/python3.6/site-packages/pytest.py
+py_requirements: python_env $(VDIR)/lib/python3.8/site-packages/flask/app.py
+test_requirements: python_env $(VDIR)/lib/python3.8/site-packages/pytest/__init__.py
 
 test: test_requirements py_requirements media/.proto.sqlite \
 	    media/i18n/en/LC_MESSAGES/messages.mo media/openapi.yaml
 	@echo "Running pytest unit tests"
 	cd media && \
 	(. $(VDIR)/bin/activate && \
-	 DB_SEED_FILE=$(PWD)/tests/db_fixture.yaml \
+	 DB_SEED_FILE=$(PWD)/tests/data/db_fixture.yaml \
 	 PYTHONPATH=. python3 -m pytest $(XARGS) ../tests \
 	 --maxfail=$(MAXFAIL) \
 	 --durations=10 \
@@ -87,7 +87,7 @@ test: test_requirements py_requirements media/.proto.sqlite \
 media/.proto.sqlite:
 	@echo Generating prototype sqlite db
 	@echo **note** schema changes require a .schema dump from apicrud
-	sqlite3 $@ < tests/schema-cac2000912a5.sql
+	sqlite3 $@ < tests/data/schema-cac2000912a5.sql
 
 media/i18n/en/LC_MESSAGES/messages.mo:
 	make i18n_compile

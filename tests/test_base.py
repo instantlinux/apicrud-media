@@ -24,7 +24,7 @@ from apicrud.session_manager import SessionManager
 from apicrud.media.storage import StorageAPI
 
 from main import application, setup_db
-from models import Account, Category, Contact, Credential, Person, Storage
+from models import Account, Category, Contact, Person
 
 global_fixture = {}
 unittest.util._MAX_LENGTH = 2000
@@ -42,7 +42,7 @@ class TestBase(unittest.TestCase):
                 'DB_URL', 'sqlite:///%s' % global_fixture['dbfile'])
             global_fixture['config'] = ServiceConfig(
                 db_url=db_url, db_seed_file=os.path.join(os.path.dirname(
-                    __file__), 'db_fixture.yaml')).config
+                    __file__), 'data', 'db_fixture.yaml')).config
             global_fixture['flask'] = global_fixture['app'].test_client()
             global_fixture['redis'] = fakeredis.FakeStrictRedis(
                 server=fakeredis.FakeServer())
@@ -114,24 +114,6 @@ class TestBase(unittest.TestCase):
         self.admin_uid = 'u-tMY1b862'
         self.adm_person_name = 'Test Admin'
         self.admin_email = 'admin@test.conclave.events'
-        record = Person(id=self.admin_uid, name=self.adm_person_name,
-                        identity=self.admin_email, privacy='public',
-                        status='active')
-        db_session.add(record)
-        record = Contact(id=self.adm_contact_id, uid=self.admin_uid,
-                         type='email', info=self.admin_email,
-                         privacy='public', status='active')
-        db_session.add(record)
-        record = Contact(id=self.adm_contact_2, uid=self.admin_uid,
-                         type='email', info='hidden-adm@test.conclave.events',
-                         privacy='member', status='active')
-        db_session.add(record)
-        record = Account(id=self.adm_account_id, name=self.admin_name,
-                         uid=self.admin_uid, status='active',
-                         settings_id=self.settings_id, is_admin=True,
-                         password=('$5$rounds=535000$e/tKrK5./UWjY8t7$Q.Lak'
-                                   '2.1dzkB4tf0aHVSyRbClPKgkzZJZNPeS0e9e31'))
-        db_session.add(record)
         record = Category(id=self.adm_cat_id, uid=self.admin_uid,
                           name='default')
         db_session.add(record)

@@ -10,6 +10,11 @@ person:
   identity: example@instantlinux.net
   privacy: public
   status: active
+- id: u-tMY1b862
+  name: Test Admin
+  identity: admin@test.conclave.events
+  privacy: public
+  status: active
 contact:
 - id: x-4566a239
   uid: x-23450001
@@ -17,6 +22,20 @@ contact:
   info: example@instantlinux.net
   muted: True
   privacy: public
+  status: active
+- id: x-6b1AUgmt
+  info: admin@test.conclave.events
+  muted: False
+  privacy: member
+  type: email
+  uid: u-tMY1b862
+  status: active
+- id: x-P703gZkJ
+  info: hidden-adm@test.conclave.events
+  muted: False
+  privacy: member
+  type: email
+  uid: u-tMY1b862
   status: active
 account:
 - id: x-54320001
@@ -26,6 +45,14 @@ account:
   settings_id: x-75023275
   password_must_change: False
   password: $5$rounds=535000$YPzbABo4IekfjkMO$mWiN711ak8D16YNyc/x.K8FBfQBp1J3q8yrokRheSy7
+  status: active
+- id: x-6hj1BXEH
+  name: testadmin
+  is_admin: True
+  uid: u-tMY1b862
+  settings_id: x-75023275
+  password_must_change: False
+  password: $5$rounds=535000$e/tKrK5./UWjY8t7$Q.Lak2.1dzkB4tf0aHVSyRbClPKgkzZJZNPeS0e9e31
   status: active
 settings:
 - id: x-75023275
