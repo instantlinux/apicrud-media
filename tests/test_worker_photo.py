@@ -133,7 +133,7 @@ class TestWorkerPhoto(test_base.TestBase):
             contents.append(dict(key=item.key, size=item.size))
         self.assertCountEqual(contents, [
             dict(key='%s.jpeg' % expected['path'], size=record['size']),
-            dict(key='%s.120.jpeg' % expected['path'], size=5902)])
+            dict(key='%s.120.jpeg' % expected['path'], size=mock.ANY)])
 
         response = self.call_endpoint('/picture/%s' % id, 'get')
         result = response.get_json()
