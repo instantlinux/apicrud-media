@@ -1,4 +1,4 @@
-FROM instantlinux/python-wsgi:3.8.5-alpine3.12
+FROM instantlinux/python-wsgi:3.8.7-alpine3.13
 MAINTAINER Rich Braun "richb@instantlinux.net"
 
 ARG BUILD_DATE
@@ -16,8 +16,8 @@ ARG CELERY_UID=2062
 EXPOSE 5555
 WORKDIR /opt/media
 COPY media/ /opt/media
-COPY requirements.txt /usr/src/
-RUN pip3 install -r /usr/src/requirements.txt && \
+COPY Pipfile* /usr/src/
+RUN cd /usr/src && pipenv install --system --deploy && \
     chmod -R g-w,o-w /opt/media && \
     adduser -u $CELERY_UID -D -s /bin/false -G users celery
 

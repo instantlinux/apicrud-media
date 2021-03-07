@@ -1,0 +1,34 @@
+[packages]
+apicrud = "==0.0.55"
+Pillow = "==7.2.0"
+
+# for faster builds, keep these versions in sync with images
+# instantlinux/python-builder and instantlinux/python-uwsgi
+alembic = "==1.4.3"
+celery = "==4.4.7"
+connexion = "*"
+"connexion[swagger-ui]" = "*"
+dollar-ref = "*"
+SQLAlchemy = "*"
+SQLAlchemy-Utils = "*"
+swagger-ui-bundle = "*"
+
+# Transitive dependencies pinned to versions of python-wsgi base image
+arrow = "==1.0.1"
+b2sdk = "==1.3.0"
+boto3 = "==1.16.47"
+botocore = "==1.19.47"
+cffi = "==1.14.4"
+cryptography = "==3.3.2"
+# TODO find the breaking-change in 0.3.0
+openapi-spec-validator = "==0.2.9"
+pycryptodomex = "==3.9.9"
+PyJWT = "==1.7.1"
+
+[dev-packages]
+coverage = "==5.4"
+fakeredis = "*"
+flake8 = "*"
+moto = "*"
+pytest = "*"
+pytest-cov = "*"

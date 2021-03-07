@@ -46,29 +46,26 @@ media/openapi.yaml: $(wildcard media/openapi/*.yaml)
 	@echo "Generating openapi.yaml"
 	. $(VDIR)/bin/activate && dref media/openapi/api.yaml $@
 
-flake8: test_requirements
+flake8: dev_requirements
 	@echo "Running flake8 code analysis"
 	. $(VDIR)/bin/activate && flake8 media tests
 
 # for the create_image rule, do this instead for openapi.yaml
 openapi_deploy:
-	pip install dollar-ref
-	ls -l $(find . -name dref)
-	/build/.local/bin/dref media/openapi/api.yaml media/openapi.yaml
+	which dref || pip install dollar-ref
+	dref media/openapi/api.yaml media/openapi.yaml
 	chmod 644 media/openapi.yaml
 
-$(VDIR)/lib/python3.8/site-packages/pytest/__init__.py:
-	@echo "Installing test requirements"
-	(. $(VDIR)/bin/activate && pip3 freeze && \
-	 pip3 install -r tests/requirements.txt)
-$(VDIR)/lib/python3.8/site-packages/flask/app.py:
-	@echo "Installing main requirements"
-	(. $(VDIR)/bin/activate && \
-	 pip3 install -r requirements.txt)
-py_requirements: python_env $(VDIR)/lib/python3.8/site-packages/flask/app.py
-test_requirements: python_env $(VDIR)/lib/python3.8/site-packages/pytest/__init__.py
+dev_requirements: python_env requirements-dev.txt
+	@echo "Installing dev requirements"
+	. $(VDIR)/bin/activate && pip install -r requirements-dev.txt
 
-test: test_requirements py_requirements media/.proto.sqlite \
+requirements-dev.txt: python_env
+	@echo Updating Pipfile.lock and requirements-dev.txt
+	. $(VDIR)/bin/activate && \
+	  pipenv lock --requirements --dev > requirements-dev.txt
+
+test: dev_requirements media/.proto.sqlite \
 	    media/i18n/en/LC_MESSAGES/messages.mo media/openapi.yaml
 	@echo "Running pytest unit tests"
 	cd media && \

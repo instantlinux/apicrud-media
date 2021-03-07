@@ -1,7 +1,7 @@
 storage:
   get:
     description: Find storage volumes based on conditions
-    operationId: find
+    operationId: StorageController.find
     parameters:
     - description: Storage ID
       in: query
@@ -79,9 +79,9 @@ storage:
     tags:
     - storage
     x-codegen-request-body-name: conditions
-    x-openapi-router-controller: controllers.storage.StorageController
+    x-openapi-router-controller: controllers.storage
   post:
-    operationId: create
+    operationId: StorageController.create
     requestBody:
       content:
         application/json:
@@ -98,10 +98,10 @@ storage:
     tags:
     - storage
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.storage.StorageController
+    x-openapi-router-controller: controllers.storage
 storage-ids:
   delete:
-    operationId: delete
+    operationId: StorageController.delete
     parameters:
     - description: storage volume ids to delete
       in: path
@@ -128,11 +128,11 @@ storage-ids:
     summary: Delete one or more storage volumes
     tags:
     - storage
-    x-openapi-router-controller: controllers.storage.StorageController
+    x-openapi-router-controller: controllers.storage
 storage-id:
   get:
     description: Returns a single storage volume
-    operationId: get
+    operationId: StorageController.get
     parameters:
     - description: ID of storage volume to return
       in: path
@@ -160,9 +160,9 @@ storage-id:
     summary: Find storage volume by ID
     tags:
     - storage
-    x-openapi-router-controller: controllers.storage.StorageController
+    x-openapi-router-controller: controllers.storage
   put:
-    operationId: update
+    operationId: StorageController.update
     parameters:
     - description: storage volume to modify
       in: path
@@ -191,4 +191,4 @@ storage-id:
     tags:
     - storage
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.storage.StorageController
+    x-openapi-router-controller: controllers.storage

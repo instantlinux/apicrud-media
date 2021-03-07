@@ -1,4 +1,4 @@
-FROM instantlinux/python-wsgi:3.8.5-alpine3.12
+FROM instantlinux/python-wsgi:3.8.7-alpine3.13
 
 MAINTAINER Rich Braun "richb@instantlinux.net"
 ARG BUILD_DATE
@@ -14,9 +14,9 @@ ENV APP_ENV=dev
 EXPOSE 8085
 WORKDIR /opt/app
 COPY media/ /opt/app
-COPY requirements.txt /usr/src/
+COPY Pipfile* /usr/src/
 
-RUN pip3 install -r /usr/src/requirements.txt && \
+RUN cd /usr/src && pipenv install --system --deploy && \
     chmod -R g-w,o-w /opt/app && \
     ln -s /usr/lib/uwsgi/python3_plugin.so /opt/app/ && \
     sed -i -e "s/^vcs_ref =.*/vcs_ref = '$VCS_REF'/" \

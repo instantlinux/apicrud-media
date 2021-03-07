@@ -1,7 +1,7 @@
 auth:
   post:
     summary: Authenticate
-    operationId: login
+    operationId: AuthController.login
     requestBody:
       content:
         application/json:
@@ -15,11 +15,11 @@ auth:
     tags:
     - auth
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.auth.AuthController
+    x-openapi-router-controller: controllers.auth
 logout:
   get:
     summary: Log out
-    operationId: logout
+    operationId: AuthController.logout
     responses:
       200:
         content: {}
@@ -29,4 +29,4 @@ logout:
         description: Invalid input
     tags:
     - auth
-    x-openapi-router-controller: controllers.auth.AuthController
+    x-openapi-router-controller: controllers.auth

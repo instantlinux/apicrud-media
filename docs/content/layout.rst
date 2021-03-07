@@ -33,6 +33,7 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     │       ├── auth.py
     │       ├── file.py
     │       ├── health.py
+    │       ├── metrics.py
     │       ├── picture.py
     │       └── storage.py
     ├── docs                     # documentation directory

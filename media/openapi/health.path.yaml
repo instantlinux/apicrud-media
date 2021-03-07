@@ -1,7 +1,7 @@
 health:
   get:
     description: Status of API
-    operationId: get
+    operationId: HealthController.get
     parameters:
     - description: Tests to run
       in: query
@@ -22,4 +22,4 @@ health:
     summary: Health Check
     tags:
     - health
-    x-openapi-router-controller: controllers.health.HealthController
+    x-openapi-router-controller: controllers.health

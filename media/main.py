@@ -11,10 +11,11 @@ from flask import g, request
 from flask_babel import Babel
 import os
 
-from apicrud import AccessControl, AccountSettings, ServiceConfig, \
+from apicrud import AccessControl, AccountSettings, Metrics, ServiceConfig, \
     ServiceRegistry, SessionManager, database, initialize
 
 import controllers
+from messaging import send_contact
 import models
 
 application = connexion.FlaskApp(__name__)
@@ -38,6 +39,8 @@ def setup_db(db_url=None, redis_conn=None):
     ServiceRegistry().register(controllers.resources())
     if __name__ in ['__main__', 'main', 'uwsgi_file_main']:
         database.initialize_db(db_url=db_url, redis_conn=redis_conn)
+        Metrics(redis_conn=redis_conn, func_send=send_contact.delay).store(
+            'api_start_timestamp', value=int(datetime.now().timestamp()))
 
 
 @application.app.before_request
@@ -53,6 +56,9 @@ def before_request():
 def add_header(response):
     """All responses get a cache-control header"""
     response.cache_control.max_age = config.HTTP_RESPONSE_CACHE_MAX_AGE
+    Metrics().store(
+        'api_request_seconds_total', value=datetime.utcnow().timestamp() -
+        g.request_start_time.timestamp())
     return response
 
 

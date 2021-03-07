@@ -344,10 +344,10 @@ CREATE TABLE IF NOT EXISTS "messages" (
 	PRIMARY KEY (id), 
 	CHECK (published IN (0, 1)), 
 	CONSTRAINT messages_fk1 FOREIGN KEY(album_id) REFERENCES albums (id), 
-	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
 	UNIQUE (id), 
+	FOREIGN KEY(sender_id) REFERENCES people (id), 
 	FOREIGN KEY(recipient_id) REFERENCES people (id), 
-	FOREIGN KEY(sender_id) REFERENCES people (id)
+	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "profileitems" (
 	id VARCHAR(16) NOT NULL, 
@@ -364,10 +364,10 @@ CREATE TABLE IF NOT EXISTS "profileitems" (
 	PRIMARY KEY (id), 
 	CONSTRAINT uniq_itemuid UNIQUE (uid, item), 
 	CONSTRAINT albums_fk1 FOREIGN KEY(album_id) REFERENCES albums (id), 
-	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
-	FOREIGN KEY(location_id) REFERENCES locations (id), 
 	UNIQUE (id), 
-	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id)
+	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
+	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
+	FOREIGN KEY(location_id) REFERENCES locations (id)
 );
 CREATE TABLE albumcontents (
 	album_id VARCHAR(16) NOT NULL, 
@@ -433,11 +433,11 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	PRIMARY KEY (id), 
 	CONSTRAINT settings_fk1 FOREIGN KEY(smtp_credential_id) REFERENCES credentials (id), 
 	CONSTRAINT settings_fk2 FOREIGN KEY(default_storage_id) REFERENCES storageitems (id), 
-	FOREIGN KEY(default_hostlist_id) REFERENCES lists (id), 
-	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
+	FOREIGN KEY(default_cat_id) REFERENCES categories (id), 
 	FOREIGN KEY(administrator_id) REFERENCES people (id), 
+	FOREIGN KEY(default_hostlist_id) REFERENCES lists (id), 
 	UNIQUE (id), 
-	FOREIGN KEY(default_cat_id) REFERENCES categories (id)
+	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id)
 );
 CREATE TABLE events (
 	id VARCHAR(16) NOT NULL, 

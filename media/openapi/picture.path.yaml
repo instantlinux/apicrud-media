@@ -1,7 +1,7 @@
 picture:
   get:
     description: Find pictures based on conditions
-    operationId: find
+    operationId: PictureController.find
     parameters:
     - description: Picture ID
       in: query
@@ -57,7 +57,17 @@ picture:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Picture'
+              type: object
+              properties:
+                items:
+                  type: array
+                  $ref: '#/components/schemas/Picture'
+                count:
+                  description: count of items returned
+                  type: integer
+                cursor_next:
+                  description: Pagination token
+                  type: string
         description: successful operation
       400:
         content: {}
@@ -70,9 +80,9 @@ picture:
     summary: Find pictures by conditions
     tags:
     - picture
-    x-openapi-router-controller: controllers.picture.PictureController
+    x-openapi-router-controller: controllers.picture
   post:
-    operationId: create
+    operationId: PictureController.create
     requestBody:
       content:
         application/json:
@@ -90,10 +100,10 @@ picture:
     tags:
     - picture
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.picture.PictureController
+    x-openapi-router-controller: controllers.picture
 picture-ids:
   delete:
-    operationId: delete
+    operationId: PictureController.delete
     parameters:
     - description: picture ids to delete
       in: path
@@ -120,11 +130,11 @@ picture-ids:
     summary: Deletes one or more pictures
     tags:
     - picture
-    x-openapi-router-controller: controllers.picture.PictureController
+    x-openapi-router-controller: controllers.picture
 picture-id:
   get:
     description: Returns a single picture
-    operationId: get
+    operationId: PictureController.get
     parameters:
     - description: ID of picture to return
       in: path
@@ -152,9 +162,9 @@ picture-id:
     summary: Find picture by ID
     tags:
     - picture
-    x-openapi-router-controller: controllers.picture.PictureController
+    x-openapi-router-controller: controllers.picture
   put:
-    operationId: update
+    operationId: PictureController.update
     parameters:
     - description: picture to modify
       in: path
@@ -184,4 +194,4 @@ picture-id:
     tags:
     - picture
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.picture.PictureController
+    x-openapi-router-controller: controllers.picture

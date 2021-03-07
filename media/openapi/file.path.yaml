@@ -1,7 +1,7 @@
 file:
   get:
     description: Find files based on conditions
-    operationId: find
+    operationId: FileController.find
     parameters:
     - description: File ID
       in: query
@@ -70,9 +70,9 @@ file:
     summary: Find files by conditions
     tags:
     - file
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file
   post:
-    operationId: create
+    operationId: FileController.create
     requestBody:
       content:
         application/json:
@@ -90,10 +90,10 @@ file:
     tags:
     - file
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file
 file-ids:
   delete:
-    operationId: delete
+    operationId: FileController.delete
     parameters:
     - description: file ids to delete
       in: path
@@ -120,11 +120,11 @@ file-ids:
     summary: Deletes one or more files
     tags:
     - file
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file
 file-id:
   get:
     description: Returns a single file
-    operationId: get
+    operationId: FileController.get
     parameters:
     - description: ID of file to return
       in: path
@@ -152,9 +152,9 @@ file-id:
     summary: Find file by ID
     tags:
     - file
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file
   put:
-    operationId: update
+    operationId: FileController.update
     parameters:
     - description: file to modify
       in: path
@@ -184,10 +184,10 @@ file-id:
     tags:
     - file
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file
 file_upload_url:
   post:
-    operationId: file_upload_url
+    operationId: FileController.file_upload_url
     requestBody:
       content:
         application/json:
@@ -206,10 +206,10 @@ file_upload_url:
     tags:
     - file
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file
 upload_complete-id:
   post:
-    operationId: upload_complete
+    operationId: FileController.upload_complete
     parameters:
     - description: ID of new file
       in: path
@@ -238,4 +238,4 @@ upload_complete-id:
     tags:
     - file
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.file.FileController
+    x-openapi-router-controller: controllers.file

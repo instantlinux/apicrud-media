@@ -25,6 +25,8 @@ components:
       $ref: 'file.schema.yaml#/File'
     FileUploadPresign:
       $ref: 'file.schema.yaml#/FileUploadPresign'
+    Metric:
+      $ref: 'metric.schema.yaml#/Metric'
     Picture:
       $ref: 'picture.schema.yaml#/Picture'
     Storage:
@@ -60,6 +62,10 @@ paths:
     $ref: 'file.path.yaml#/upload_complete-id'
   /health:
     $ref: 'health.path.yaml#/health'
+  /metric:
+    $ref: 'metric.path.yaml#/metric'
+  /metrics:
+    $ref: 'metric.path.yaml#/metric-collect'
   /picture:
     $ref: 'picture.path.yaml#/picture'
   /picture/{id}:    
