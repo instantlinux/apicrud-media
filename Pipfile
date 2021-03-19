@@ -1,6 +1,6 @@
 [packages]
 apicrud = "==0.0.56"
-Pillow = "==7.2.0"
+Pillow = "==8.1.1"
 
 # for faster builds, keep these versions in sync with images
 # instantlinux/python-builder and instantlinux/python-uwsgi
