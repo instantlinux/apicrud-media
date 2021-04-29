@@ -10,10 +10,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from apicrud import ServiceConfig
 
 Base = declarative_base()
+# TODO set this value after initialize.app not at import time
 aes_secret = ServiceConfig().config.DB_AES_SECRET
 
 
 class AsDictMixin(object):
+
     def as_dict(self):
         """Returns a serializable dict from an instance of the model
 
@@ -31,5 +33,8 @@ class AsDictMixin(object):
         if hasattr(self, '__rest_related__'):
             for key in self.__rest_related__:
                 retval[key] = [rec.id for rec in getattr(self, key)]
+        if hasattr(self, '__rest_hybrid__'):
+            for key in self.__rest_hybrid__:
+                retval[key] = getattr(self, key)
         retval.pop('_sa_instance_state', None)
         return retval

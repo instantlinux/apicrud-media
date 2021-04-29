@@ -11,9 +11,12 @@ export APP_ENV ?= local
 include Makefile.vars
 include Makefile.i18n
 
+VENV=python_env
+VDIR=$(PWD)/$(VENV)
+
 # Local dev
 
-run_media: py_requirements
+run_media: dev_requirements
 	. $(VDIR)/bin/activate && \
 	  AMQ_HOST=$(RABBITMQ_IP) REDIS_HOST=$(REDIS_IP) \
 	  PUBLIC_URL=http://$(FQDN):$(APP_PORT) \
@@ -25,9 +28,6 @@ media_worker:
 	  PYTHONPATH=media \
 	  celery -A media_worker worker -Q media_$(APP_ENV) \
 	  -n media1@%h --loglevel=INFO
-
-VENV=python_env
-VDIR=$(PWD)/$(VENV)
 
 .PHONY: qemu
 
@@ -78,7 +78,7 @@ test: dev_requirements media/.proto.sqlite \
 	 --cov-report html \
 	 --cov-report xml \
 	 --cov-report term-missing \
-	 --cov ../python_env/lib/python*/site-packages/apicrud/media \
+	 --cov ~/.local/lib/python*/site-packages/apicrud/media \
 	 --cov .)
 
 media/.proto.sqlite:

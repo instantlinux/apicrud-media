@@ -1,5 +1,6 @@
 health:
   get:
+    summary: Health Check
     description: Status of API
     operationId: HealthController.get
     parameters:
@@ -9,8 +10,8 @@ health:
       required: false
       schema:
         items:
-          maxLength: 10
           type: string
+          maxLength: 10
         type: array
     responses:
       200:
@@ -19,7 +20,6 @@ health:
       503:
         content: {}
         description: Service unhealthy
-    summary: Health Check
     tags:
     - health
     x-openapi-router-controller: controllers.health

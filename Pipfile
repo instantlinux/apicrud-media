@@ -1,6 +1,6 @@
 [packages]
-apicrud = "==0.0.56"
-Pillow = "==7.2.0"
+apicrud = "==0.0.66"
+Pillow = "==8.1.2"
 
 # for faster builds, keep these versions in sync with images
 # instantlinux/python-builder and instantlinux/python-uwsgi
@@ -9,7 +9,8 @@ celery = "==4.4.7"
 connexion = "*"
 "connexion[swagger-ui]" = "*"
 dollar-ref = "*"
-SQLAlchemy = "*"
+# 1.4.1 throws shitloads of warnings
+SQLAlchemy = "==1.3.23"
 SQLAlchemy-Utils = "*"
 swagger-ui-bundle = "*"
 

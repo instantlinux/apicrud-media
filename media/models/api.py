@@ -8,9 +8,10 @@ license: lgpl-2.1
 # coding: utf-8
 
 # from geoalchemy2 import Geometry
-from sqlalchemy import BOOLEAN, Column, Enum, ForeignKey, INTEGER, String, \
-     TEXT, TIMESTAMP, Unicode, UniqueConstraint
+from sqlalchemy import BOOLEAN, Column, Enum, ForeignKey, INTEGER, \
+     LargeBinary, String, TEXT, TIMESTAMP, Unicode, UniqueConstraint
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine, \
     StringEncryptedType
@@ -24,8 +25,9 @@ class Account(AsDictMixin, Base):
     __table_args__ = (
         UniqueConstraint(u'id', u'uid', name='uniq_account_user'),
     )
-    __rest_exclude__ = ('password', 'totp_secret', 'invalid_attempts',
-                        'last_invalid_attempt')
+    __rest_exclude__ = ('backup_codes', 'password', 'totp_secret',
+                        'invalid_attempts', 'last_invalid_attempt')
+    __rest_hybrid__ = ('totp',)
 
     id = Column(String(16), primary_key=True, unique=True)
     name = Column(String(32), nullable=False, unique=True)
@@ -36,7 +38,8 @@ class Account(AsDictMixin, Base):
     password_must_change = Column(BOOLEAN, nullable=False,
                                   server_default="False")
     totp_secret = Column(StringEncryptedType(Unicode, aes_secret, AesEngine,
-                                             'pkcs5', length=48))
+                                             'pkcs5', length=64))
+    backup_codes = Column(LargeBinary(256))
     is_admin = Column(BOOLEAN, nullable=False, server_default="False")
     settings_id = Column(ForeignKey(u'settings.id'), nullable=False)
     last_login = Column(TIMESTAMP)
@@ -49,6 +52,10 @@ class Account(AsDictMixin, Base):
     owner = relationship('Person', foreign_keys=[uid], backref=backref(
         'account_uid', cascade='all, delete-orphan'))
     settings = relationship('Settings')
+
+    @hybrid_property
+    def totp(self):
+        return True if self.totp_secret else False
 
 
 class APIkey(AsDictMixin, Base):
@@ -361,7 +368,7 @@ class Profile(AsDictMixin, Base):
     id = Column(String(16), primary_key=True, unique=True)
     uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'), nullable=False)
     item = Column(String(32), nullable=False)
-    value = Column(String(32))
+    value = Column(String(96))
     location_id = Column(ForeignKey(u'locations.id'))
     tz_id = Column(ForeignKey(u'time_zone_name.id'))
     privacy = Column(String(8), nullable=False, server_default=u'public')

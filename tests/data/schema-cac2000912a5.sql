@@ -158,8 +158,8 @@ CREATE TABLE IF NOT EXISTS "listmembers" (
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
 	PRIMARY KEY (uid, list_id), 
 	CONSTRAINT uniq_listmember UNIQUE (list_id, uid), 
-	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE, 
-	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE
+	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
+	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE
 );
 CREATE INDEX ix_listmembers_list_id ON listmembers (list_id);
 CREATE TABLE IF NOT EXISTS "listmessages" (
@@ -168,8 +168,8 @@ CREATE TABLE IF NOT EXISTS "listmessages" (
 	created TIMESTAMP DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
 	PRIMARY KEY (message_id, list_id), 
 	CONSTRAINT uniq_listmessage UNIQUE (list_id, message_id), 
-	FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE, 
-	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE
+	FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE CASCADE, 
+	FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE
 );
 CREATE INDEX ix_listmessages_list_id ON listmessages (list_id);
 CREATE TABLE scopes (
@@ -200,7 +200,8 @@ CREATE TABLE accounts (
 	uid VARCHAR(16) NOT NULL, 
 	password VARCHAR(128) NOT NULL, 
 	password_must_change BOOLEAN DEFAULT 0 NOT NULL, 
-	totp_secret VARCHAR(48), 
+	totp_secret VARCHAR(64), 
+	backup_codes BLOB, 
 	is_admin BOOLEAN DEFAULT 0 NOT NULL, 
 	settings_id VARCHAR(16) NOT NULL, 
 	last_login TIMESTAMP, 
@@ -344,16 +345,16 @@ CREATE TABLE IF NOT EXISTS "messages" (
 	PRIMARY KEY (id), 
 	CHECK (published IN (0, 1)), 
 	CONSTRAINT messages_fk1 FOREIGN KEY(album_id) REFERENCES albums (id), 
-	UNIQUE (id), 
-	FOREIGN KEY(sender_id) REFERENCES people (id), 
 	FOREIGN KEY(recipient_id) REFERENCES people (id), 
+	FOREIGN KEY(sender_id) REFERENCES people (id), 
+	UNIQUE (id), 
 	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "profileitems" (
 	id VARCHAR(16) NOT NULL, 
 	uid VARCHAR(16) NOT NULL, 
 	item VARCHAR(16) NOT NULL, 
-	value VARCHAR(32), 
+	value VARCHAR(96), 
 	location_id VARCHAR(16), 
 	tz_id INTEGER, 
 	privacy VARCHAR(8) DEFAULT 'public' NOT NULL, 
@@ -364,10 +365,10 @@ CREATE TABLE IF NOT EXISTS "profileitems" (
 	PRIMARY KEY (id), 
 	CONSTRAINT uniq_itemuid UNIQUE (uid, item), 
 	CONSTRAINT albums_fk1 FOREIGN KEY(album_id) REFERENCES albums (id), 
-	UNIQUE (id), 
-	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
 	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
-	FOREIGN KEY(location_id) REFERENCES locations (id)
+	FOREIGN KEY(uid) REFERENCES people (id) ON DELETE CASCADE, 
+	FOREIGN KEY(location_id) REFERENCES locations (id), 
+	UNIQUE (id)
 );
 CREATE TABLE albumcontents (
 	album_id VARCHAR(16) NOT NULL, 
@@ -433,11 +434,11 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	PRIMARY KEY (id), 
 	CONSTRAINT settings_fk1 FOREIGN KEY(smtp_credential_id) REFERENCES credentials (id), 
 	CONSTRAINT settings_fk2 FOREIGN KEY(default_storage_id) REFERENCES storageitems (id), 
-	FOREIGN KEY(default_cat_id) REFERENCES categories (id), 
-	FOREIGN KEY(administrator_id) REFERENCES people (id), 
 	FOREIGN KEY(default_hostlist_id) REFERENCES lists (id), 
-	UNIQUE (id), 
-	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id)
+	FOREIGN KEY(tz_id) REFERENCES time_zone_name (id), 
+	FOREIGN KEY(administrator_id) REFERENCES people (id), 
+	FOREIGN KEY(default_cat_id) REFERENCES categories (id), 
+	UNIQUE (id)
 );
 CREATE TABLE events (
 	id VARCHAR(16) NOT NULL, 

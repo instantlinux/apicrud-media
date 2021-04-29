@@ -5,7 +5,9 @@ Initialize each controller
 created 14-jan-2020 by richb@instantlinux.net
 """
 
-from . import album, file, metric, picture, storage
+from apicrud.controllers import metric
+
+from . import album, file, picture, storage
 
 
 def resources():

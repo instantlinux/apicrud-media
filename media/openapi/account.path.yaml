@@ -15,7 +15,7 @@ auth:
     tags:
     - auth
     x-codegen-request-body-name: body
-    x-openapi-router-controller: controllers.auth
+    x-openapi-router-controller: apicrud.controllers.auth
 logout:
   get:
     summary: Log out
@@ -29,4 +29,4 @@ logout:
         description: Invalid input
     tags:
     - auth
-    x-openapi-router-controller: controllers.auth
+    x-openapi-router-controller: apicrud.controllers.auth

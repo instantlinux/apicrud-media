@@ -12,7 +12,9 @@ import test_base
 class TestAlbums(test_base.TestBase):
 
     def setUp(self):
-        self.authorize(username=self.admin_name, password=self.admin_pw)
+        self.assertEqual(
+            self.authorize(username=self.admin_name, password=self.admin_pw),
+            201, 'Check database, admin account not found')
 
     def test_add_and_fetch_album(self):
         record = dict(name='my album', sizes=[240, 1024])

@@ -70,11 +70,6 @@ class AlbumContent(Base):
     rank = Column(Float)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
-    album = relationship('Album', foreign_keys=[album_id], backref=backref(
-        'albumcontents', cascade='all, delete-orphan'))
-    picture = relationship('Picture', backref=backref(
-        'albumcontents', cascade='all, delete-orphan'))
-
 
 class File(AsDictMixin, Base):
     __tablename__ = 'files'
@@ -114,11 +109,6 @@ class ListFile(Base):
                      nullable=False, index=True)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
-    file = relationship('File', foreign_keys=[file_id], backref=backref(
-        'listfiles', cascade='all, delete-orphan'))
-    list = relationship('List', backref=backref(
-        'listfiles', cascade='all, delete-orphan'))
-
 
 # Message attachments
 class MessageFile(Base):
@@ -132,11 +122,6 @@ class MessageFile(Base):
     message_id = Column(ForeignKey(u'messages.id', ondelete='CASCADE'),
                         nullable=False, index=True)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
-
-    file = relationship('File', foreign_keys=[file_id], backref=backref(
-        'messagefiles', cascade='all, delete-orphan'))
-    message = relationship('Message', backref=backref(
-        'messagefiles', cascade='all, delete-orphan'))
 
 
 class Picture(Base):
