@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0b0537a3bd93f71af02f5f6a52aa154f4146afa8affc3a2030f5b5f54041cc7f"
+            "sha256": "b5588ed8246fe1c396c2af53dd19e973d0ba59a69ca7ce18bc457724cd383fd9"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -32,11 +32,11 @@
         },
         "apicrud": {
             "hashes": [
-                "sha256:8c549f79f940334c9fe40762f8debf1aba552843ad77f16911ca37f67251974e",
-                "sha256:f369104a36aee950e8d4196a3d82bf1f0a0187d6847b8ab12a2120cb66915984"
+                "sha256:3982bddb288b4b7c52bc5cf313e950ab2ec463f5be34c94458c052a8bb52aca5",
+                "sha256:8d00c61c0c24f18866ff5926ee4c6eeaf341c05e258f27834c13b028e67fceb7"
             ],
             "index": "pypi",
-            "version": "==0.0.66"
+            "version": "==0.0.67"
         },
         "arrow": {
             "hashes": [

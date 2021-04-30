@@ -1,5 +1,5 @@
 [packages]
-apicrud = "==0.0.66"
+apicrud = "==0.0.67"
 Pillow = "==8.1.2"
 
 # for faster builds, keep these versions in sync with images
