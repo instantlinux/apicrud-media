@@ -131,7 +131,6 @@ else
 	    --build-arg=VCS_REF=$(CI_COMMIT_SHA) \
 	    --build-arg=BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%SZ) \
 	;)
-	curl -X post https://hooks.microbadger.com/images/$(USER_LOGIN)/$(IMGNAME)-$${image}/$(MICROBADGER_TOKEN)
 endif
 
 clean_images:

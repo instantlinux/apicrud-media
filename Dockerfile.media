@@ -1,4 +1,4 @@
-FROM instantlinux/python-wsgi:3.8.8-alpine3.13
+FROM instantlinux/python-wsgi:3.9.5-alpine3.14
 
 MAINTAINER Rich Braun "richb@instantlinux.net"
 ARG BUILD_DATE
@@ -17,7 +17,7 @@ COPY media/ /opt/app
 COPY Pipfile* /usr/src/
 
 RUN cd /usr/src && pipenv install --system --deploy && \
-    chmod -R g-w,o-w /opt/app && \
+    chmod -R g-w,o-w,g+rX,o+rX /opt/app && \
     ln -s /usr/lib/uwsgi/python3_plugin.so /opt/app/ && \
     sed -i -e "s/^vcs_ref =.*/vcs_ref = '$VCS_REF'/" \
       -e "s/^__version__ =.*/__version__ = '$TAG'/" \
