@@ -19,7 +19,7 @@ arrow = "==0.17.0"
 b2sdk = "==1.12.0"
 boto3 = "==1.17.93"
 botocore = "1.20.93"
-cffi = "==1.14.6"
+cffi = "==1.14.5"
 cryptography = "==3.3.2"
 # TODO update to support 0.3.x
 openapi-spec-validator = "==0.2.9"
