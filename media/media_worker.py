@@ -10,7 +10,7 @@ from datetime import datetime
 import logging
 import os
 
-from apicrud import ServiceConfig
+from apicrud import initialize
 from apicrud.exceptions import MediaUploadError
 from apicrud.media.worker_processing import MediaProcessing
 from apicrud.metrics import Metrics
@@ -21,8 +21,6 @@ import models
 
 app = celery.Celery()
 app.config_from_object(celeryconfig)
-config = ServiceConfig(reset=True, file=os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), 'config.yaml'), models=models).config
 
 
 @app.task(name="tasks.media.media_worker.incoming")
@@ -53,3 +51,7 @@ def incoming(uid, file_id):
 
     logging.info("action=incoming status=success uid=%s name=%s file_id=%s "
                  % (uid, media.meta["name"], file_id))
+
+
+initialize.worker(models=models,
+                  path=os.path.dirname(os.path.abspath(__file__)))

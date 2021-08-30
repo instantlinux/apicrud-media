@@ -57,13 +57,12 @@ openapi_deploy:
 	chmod 644 media/openapi.yaml
 
 dev_requirements: python_env requirements-dev.txt
-	@echo "Installing dev requirements"
-	. $(VDIR)/bin/activate && pip install -r requirements-dev.txt
 
 requirements-dev.txt: python_env
 	@echo Updating Pipfile.lock and requirements-dev.txt
-	. $(VDIR)/bin/activate && \
-	  pipenv lock --requirements --dev > requirements-dev.txt
+	. $(VDIR)/bin/activate && pipenv lock --requirements --dev > $@ || rm $@
+	@echo "Installing dev requirements"
+	. $(VDIR)/bin/activate && pip install -r $@
 
 test: dev_requirements media/.proto.sqlite \
 	    media/i18n/en/LC_MESSAGES/messages.mo media/openapi.yaml

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e5b3a63de0dc98ef3248954c21e9452e14e52ebc8de9799cf417197b7ede8bb2"
+            "sha256": "d75b7ab4f5eb345bf11603157411a1e20ff2fe8d8a4689ff908c30ac40993de7"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -32,11 +32,11 @@
         },
         "apicrud": {
             "hashes": [
-                "sha256:5eddecd034ce47dcd5eb7974b862835126f5ee7be1939cfd7570f869c257b44e",
-                "sha256:c5607a73ad173938f88c3fd2aeba4c9d7c91b94cd43f2c60f502cfb1c97ca8ed"
+                "sha256:023ab1875fbbe60ed99565dd5e011e9c5618e2702bf796dbaff0eae579a10caa",
+                "sha256:0a25bc5b5327b2273943a24dab9f6c70c300aac7aea6faff0795d968871a39f6"
             ],
             "index": "pypi",
-            "version": "==0.0.75"
+            "version": "==0.0.77"
         },
         "arrow": {
             "hashes": [
@@ -221,9 +221,7 @@
             "version": "==20.10.2"
         },
         "connexion": {
-            "extras": [
-                "swagger-ui"
-            ],
+            "extras": [],
             "hashes": [
                 "sha256:1ccfac57d4bb7adf4295ba6f5e48f5a1f66057df6a0713417766c9b5235182ee",
                 "sha256:5439e9659a89c4380d93a07acfbf3380d70be4130574de8881e5f0dfec7ad0e2"
@@ -1122,11 +1120,11 @@
         },
         "moto": {
             "hashes": [
-                "sha256:45ec8723c51386ad0062d76bbd7c49239c97811988d4f547067eb52a72558134",
-                "sha256:53048c61091c9bc612d8a0258fdfd4361250e0d786a8403879d801db7fca1e40"
+                "sha256:21c838b63f44e24b9b5015a2cdcc5be7c1e1004e58a69fb7cac71383bce34535",
+                "sha256:e86b0d92bc5f80802a8ae0f338a4fdac15dab82c54eb12db93b356b69407effc"
             ],
             "index": "pypi",
-            "version": "==2.2.5"
+            "version": "==2.2.6"
         },
         "packaging": {
             "hashes": [
