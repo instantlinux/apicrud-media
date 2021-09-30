@@ -19,13 +19,17 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine, \
     StringEncryptedType
 
 import constants
-from .base import aes_secret, AsDictMixin, Base
+from apicrud.models.base import get_aes_secret, AsDictMixin, Base
+app_schema = 'media'
+schema_pre = app_schema + '.' if app_schema else ''
+core_pre = 'apicrud.' if app_schema else ''
 
 
 class Album(AsDictMixin, Base):
     __tablename__ = 'albums'
     __table_args__ = (
         UniqueConstraint(u'name', u'uid', name='uniq_album_user'),
+        dict(schema=app_schema),
     )
     __rest_related__ = ('pictures',)
 
@@ -34,20 +38,23 @@ class Album(AsDictMixin, Base):
     sizes = Column(String(32), nullable=False,
                    server_default=constants.DEFAULT_THUMBNAIL_SIZES)
     encryption = Column(Enum(u'aes'))
-    password = Column(StringEncryptedType(Unicode, aes_secret, AesEngine,
+    password = Column(StringEncryptedType(Unicode, get_aes_secret, AesEngine,
                                           'pkcs5', length=64))
-    uid = Column(ForeignKey(u'people.id', ondelete='CASCADE'), nullable=False)
-    list_id = Column(ForeignKey(u'lists.id'))
-    event_id = Column(ForeignKey(u'events.id'))
-    cover_id = Column(ForeignKey(u'pictures.id'))
-    category_id = Column(ForeignKey(u'categories.id'), nullable=False)
+    uid = Column(ForeignKey(u'%speople.id' % core_pre, ondelete='CASCADE'),
+                 nullable=False)
+    list_id = Column(ForeignKey(u'%slists.id' % core_pre))
+    event_id = Column(String(16))
+    cover_id = Column(ForeignKey(u'%spictures.id' % schema_pre))
+    category_id = Column(ForeignKey(u'%scategories.id' % core_pre),
+                         nullable=False)
     privacy = Column(String(8), nullable=False, server_default=u'invitee')
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
     modified = Column(TIMESTAMP)
     status = Column(Enum('active', u'disabled'), nullable=False,
                     server_default=u'active')
 
-    pictures = relationship('Picture', secondary='albumcontents',
+    pictures = relationship('Picture',
+                            secondary='%salbumcontents' % schema_pre,
                             backref=backref('albums'),
                             order_by='AlbumContent.rank')
     cover = relationship('Picture', foreign_keys=[cover_id])
@@ -61,12 +68,15 @@ class AlbumContent(Base):
     __tablename__ = 'albumcontents'
     __table_args__ = (
         UniqueConstraint(u'album_id', u'picture_id', name='uniq_albumpic'),
+        dict(schema=app_schema),
     )
 
-    album_id = Column(ForeignKey(u'albums.id', ondelete='CASCADE'),
-                      primary_key=True, nullable=False)
-    picture_id = Column(ForeignKey(u'pictures.id', ondelete='CASCADE'),
-                        nullable=False, index=True)
+    album_id = Column(
+        ForeignKey(u'%salbums.id' % schema_pre, ondelete='CASCADE'),
+        primary_key=True, nullable=False)
+    picture_id = Column(
+        ForeignKey(u'%spictures.id' % schema_pre, ondelete='CASCADE'),
+        nullable=False, index=True)
     rank = Column(Float)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
@@ -81,11 +91,12 @@ class File(AsDictMixin, Base):
     size = Column(BIGINT)
     sha1 = Column(LargeBinary(length=20))
     sha256 = Column(LargeBinary(length=32))
-    storage_id = Column(ForeignKey(u'storageitems.id'))
-    list_id = Column(ForeignKey(u'list.id'))
-    event_id = Column(ForeignKey(u'events.id'))
+    storage_id = Column(ForeignKey(u'%sstorageitems.id' % core_pre))
+    list_id = Column(ForeignKey(u'%slist.id' % core_pre))
+    event_id = Column(String(16))
     privacy = Column(String(8), nullable=False, server_default=u'member')
-    uid = Column(ForeignKey(u'people.id'), nullable=False, index=True)
+    uid = Column(ForeignKey(u'%speople.id' % core_pre), nullable=False,
+                 index=True)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
     modified = Column(TIMESTAMP)
     status = Column(Enum('active', u'disabled'), nullable=False,
@@ -101,11 +112,13 @@ class ListFile(Base):
     __tablename__ = 'listfiles'
     __table_args__ = (
         UniqueConstraint(u'list_id', u'file_id', name='uniq_listfile'),
+        dict(schema=app_schema),
     )
 
-    file_id = Column(ForeignKey(u'files.id', ondelete='CASCADE'),
-                     primary_key=True, nullable=False)
-    list_id = Column(ForeignKey(u'lists.id', ondelete='CASCADE'),
+    file_id = Column(
+        ForeignKey(u'%sfiles.id' % schema_pre, ondelete='CASCADE'),
+        primary_key=True, nullable=False)
+    list_id = Column(ForeignKey(u'%slists.id' % core_pre, ondelete='CASCADE'),
                      nullable=False, index=True)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
@@ -115,23 +128,29 @@ class MessageFile(Base):
     __tablename__ = 'messagefiles'
     __table_args__ = (
         UniqueConstraint(u'message_id', u'file_id', name='uniq_messagefile'),
+        dict(schema=app_schema),
     )
 
-    file_id = Column(ForeignKey(u'files.id', ondelete='CASCADE'),
-                     primary_key=True, nullable=False)
-    message_id = Column(ForeignKey(u'messages.id', ondelete='CASCADE'),
-                        nullable=False, index=True)
+    file_id = Column(
+        ForeignKey(u'%sfiles.id' % schema_pre, ondelete='CASCADE'),
+        primary_key=True, nullable=False)
+    message_id = Column(
+        ForeignKey(u'%smessages.id' % core_pre, ondelete='CASCADE'),
+        nullable=False, index=True)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
 
 class Picture(Base):
     __tablename__ = 'pictures'
+    __table_args__ = (
+        dict(schema=app_schema),
+    )
 
     id = Column(String(16), primary_key=True, unique=True)
     name = Column(String(64), nullable=False)
     path = Column(String(64), server_default="", nullable=False)
     caption = Column(String(255))
-    uid = Column(ForeignKey(u'people.id'), nullable=False)
+    uid = Column(ForeignKey(u'%speople.id' % core_pre), nullable=False)
     size = Column(BIGINT)
     sha1 = Column(LargeBinary(length=20))
     sha256 = Column(LargeBinary(length=32))
@@ -156,8 +175,10 @@ class Picture(Base):
     width = Column(INTEGER)
 
     privacy = Column(String(8), nullable=False, server_default=u'invitee')
-    category_id = Column(ForeignKey(u'categories.id'), nullable=False)
-    storage_id = Column(ForeignKey(u'storageitems.id'), nullable=False)
+    category_id = Column(ForeignKey(u'%scategories.id' % core_pre),
+                         nullable=False)
+    storage_id = Column(ForeignKey(u'%sstorageitems.id' % core_pre),
+                        nullable=False)
     created = Column(TIMESTAMP, nullable=False, server_default=func.now())
     modified = Column(TIMESTAMP)
     status = Column(Enum('active', u'disabled'), nullable=False)

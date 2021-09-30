@@ -4,7 +4,6 @@
 *.mo
 *.pyc
 .coverage
-.proto.sqlite
 build
 _build
 coverage.xml
@@ -17,3 +16,4 @@ python_env
 results.xml
 stubs
 tmp
+venv

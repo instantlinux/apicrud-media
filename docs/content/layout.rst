@@ -10,14 +10,14 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     ├── aws-s3-policy.json
     ├── b2-cors.json.json
     ├── media
+    │   ├── alembic.ini          # alembic config settings
     │   ├── celeryconfig.py      # celery-worker parameters
     │   ├── config.yaml          # application settings
     │   ├── constants.py         # global constants
+    │   ├── db_seed.yaml         # any initial seed records for db
     │   ├── main.py              # top-level startup
     │   ├── models
     │   │   ├── __init__.py      # models for database schema
-    │   │   ├── api.py           # open-core API models
-    │   │   ├── base.py          # declarative base
     │   │   └── media.py         # open-core media models
     │   ├── models               # models for database schema
     │   ├── openapi              # OpenAPI 3.0 specifications

@@ -48,7 +48,8 @@ media/openapi.yaml: $(wildcard media/openapi/*.yaml)
 
 flake8: dev_requirements
 	@echo "Running flake8 code analysis"
-	. $(VDIR)/bin/activate && flake8 media tests
+	. $(VDIR)/bin/activate && flake8 media tests \
+	 --per-file-ignores='*/alembic/versions/*:E501,E122,E128' 
 
 # for the create_image rule, do this instead for openapi.yaml
 openapi_deploy:
@@ -64,8 +65,7 @@ requirements-dev.txt: python_env
 	@echo "Installing dev requirements"
 	. $(VDIR)/bin/activate && pip install -r $@
 
-test: dev_requirements media/.proto.sqlite \
-	    media/i18n/en/LC_MESSAGES/messages.mo media/openapi.yaml
+test: dev_requirements media/i18n/en/LC_MESSAGES/messages.mo media/openapi.yaml
 	@echo "Running pytest unit tests"
 	cd media && \
 	(. $(VDIR)/bin/activate && \
@@ -80,17 +80,12 @@ test: dev_requirements media/.proto.sqlite \
 	 --cov ~/.local/lib/python*/site-packages/apicrud/media \
 	 --cov .)
 
-media/.proto.sqlite:
-	@echo Generating prototype sqlite db
-	@echo **note** schema changes require a .schema dump from apicrud
-	sqlite3 $@ < tests/data/schema-cac2000912a5.sql
-
 media/i18n/en/LC_MESSAGES/messages.mo:
 	make i18n_compile
 
 clean:
 	rm -rf build dist *.egg-info .cache .pytest_cache */__pycache__ \
-	 */.coverage */.proto.sqlite */coverage.xml */htmlcov */results.xml \
+	 */.coverage */coverage.xml */htmlcov */results.xml \
 	 docs/_build docs/content/stubs media/openapi.yaml
 	find . -name '*.pyc' -or -name '*~' -exec rm -rf {} \;
 wipe_clean: clean

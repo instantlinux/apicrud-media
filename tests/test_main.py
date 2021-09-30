@@ -19,7 +19,7 @@ class TestMain(test_base.TestBase):
     def test_healthcheck(self):
         expected = dict(
             description=self.config.APPNAME + ' - ' + 'media',
-            notes=['build_date:' + _version.build_date, 'schema:cac2000912a5',
+            notes=['build_date:' + _version.build_date, 'schema:960a020329f8',
                    'apicrud_version:' + apicrud._version.__version__],
             releaseId='unset',
             serviceId='media',

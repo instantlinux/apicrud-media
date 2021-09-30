@@ -8,11 +8,10 @@ created 10-oct-2019 by richb@instantlinux.net
 import fakeredis
 import os
 import pytest
-import subprocess
 import tempfile
 import unittest
 
-from apicrud import database, initialize, state
+from apicrud import initialize, state
 from apicrud.test.base import TestBaseMixin, test_globals
 import controllers
 from main import application
@@ -30,7 +29,6 @@ class TestBase(TestBaseMixin, unittest.TestCase):
             test_globals['dbfile'] = tempfile.mkstemp(prefix='_db')[1]
             db_url = os.environ.get(
                 'DB_URL', 'sqlite:///%s' % test_globals['dbfile'])
-            subprocess.Popen(['cp', '.proto.sqlite', test_globals['dbfile']])
             path = os.path.join(os.path.dirname(
                 os.path.abspath(__file__)), '..', 'media')
             db_seed_file = os.path.join(path, '..', 'tests', 'data',
@@ -41,9 +39,6 @@ class TestBase(TestBaseMixin, unittest.TestCase):
                 application, controllers, models, path,
                 db_seed_file=db_seed_file, db_url=db_url,
                 redis_conn=redis_conn)
-            db_session = database.get_session(db_url=db_url)
-            database.seed_new_db(db_session)
-            db_session.remove()
             self.baseSetup()
         yield test_globals
         try:

@@ -1,5 +1,5 @@
 [packages]
-apicrud = "==0.0.78"
+apicrud = "==0.2.2"
 Pillow = "==8.2.0"
 
 # for faster builds, keep these versions in sync with images
@@ -26,6 +26,9 @@ openapi-spec-validator = "==0.2.9"
 pycryptodomex = "==3.10.1"
 PyJWT = "*"
 six = "==1.15.0"
+
+# I don't f'ing understand why this fixes the click 7.1.2 dependency
+click-didyoumean = "==0.0.3"
 
 [dev-packages]
 coverage = "==5.5"
