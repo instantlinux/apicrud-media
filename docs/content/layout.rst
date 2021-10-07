@@ -14,7 +14,7 @@ This repository provides the layout for a typical Dockerized microservice. Here'
     │   ├── celeryconfig.py      # celery-worker parameters
     │   ├── config.yaml          # application settings
     │   ├── constants.py         # global constants
-    │   ├── db_seed.yaml         # any initial seed records for db
+    │   ├── db_seed.yaml         # (opt) initial seed records for db
     │   ├── main.py              # top-level startup
     │   ├── models
     │   │   ├── __init__.py      # models for database schema

@@ -5,5 +5,6 @@ appname: Media
 # db_migrate_enable: false
 # db_schema_maxtime: 0
 db_schemas: [ apicrud, media ]
+db_seed_enable: false
 service_name: media
 thumbnail_tiny: 50
