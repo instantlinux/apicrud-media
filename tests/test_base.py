@@ -29,6 +29,7 @@ class TestBase(TestBaseMixin, unittest.TestCase):
             test_globals['dbfile'] = tempfile.mkstemp(prefix='_db')[1]
             db_url = os.environ.get(
                 'DB_URL', 'sqlite:///%s' % test_globals['dbfile'])
+            os.environ['DB_SEED_ENABLE'] = 'true'
             path = os.path.join(os.path.dirname(
                 os.path.abspath(__file__)), '..', 'media')
             db_seed_file = os.path.join(path, '..', 'tests', 'data',
