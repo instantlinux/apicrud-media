@@ -1,6 +1,6 @@
 [packages]
-apicrud = "==0.2.3"
-Pillow = "==8.2.0"
+apicrud = "==0.2.7"
+Pillow = "==8.4.0"
 
 # for faster builds, keep these versions in sync with images
 # instantlinux/python-builder and instantlinux/python-uwsgi
@@ -16,24 +16,24 @@ swagger-ui-bundle = "*"
 
 # Transitive dependencies pinned to versions of python-wsgi base image
 arrow = "==0.17.0"
-b2sdk = "==1.12.0"
-boto3 = "==1.17.93"
-botocore = "1.20.93"
+b2sdk = "==1.13.0"
+boto3 = "==1.18.49"
+botocore = "1.21.49"
 cffi = "==1.14.5"
 cryptography = "==3.3.2"
 # TODO update to support 0.3.x
 openapi-spec-validator = "==0.2.9"
 pycryptodomex = "==3.10.1"
 PyJWT = "*"
-six = "==1.15.0"
+six = "==1.16.0"
 
 # I don't f'ing understand why this fixes the click 7.1.2 dependency
 click-didyoumean = "==0.0.3"
 
 [dev-packages]
-coverage = "==5.5"
+coverage = "==6.2"
 fakeredis = "*"
-flake8 = "3.9.2"
+flake8 = "4.0.1"
 moto = "*"
 pytest = "*"
 pytest-cov = "*"
