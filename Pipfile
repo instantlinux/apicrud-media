@@ -1,6 +1,6 @@
 [packages]
 apicrud = "==0.2.7"
-Pillow = "==8.4.0"
+Pillow = "==9.0.0"
 
 # for faster builds, keep these versions in sync with images
 # instantlinux/python-builder and instantlinux/python-uwsgi
@@ -15,8 +15,8 @@ SQLAlchemy-Utils = "*"
 swagger-ui-bundle = "*"
 
 # Transitive dependencies pinned to versions of python-wsgi base image
-arrow = "==0.17.0"
-b2sdk = "==1.13.0"
+arrow = "==1.2.1"
+b2sdk = "==1.14.0"
 boto3 = "==1.18.49"
 botocore = "1.21.49"
 cffi = "==1.14.5"
