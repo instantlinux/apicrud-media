@@ -14,7 +14,6 @@ beautifulsoup4==4.9.3
 commonmark==0.9.1
 imagesize==1.2.0
 Markdown==3.3.4
-pycparser==2.20
 pydash==4.9.3
 Pygments==2.8.1
 snowballstemmer==2.1.0
@@ -44,6 +43,7 @@ yapf==0.30.0
 # jsonschema>=3.2.0
 # packaging>=20.9
 # pycryptodomex>=3.9.9
+# pycparser==2.21
 # pyparsing==2.4.7
 # requests>=2.25.1
 # six>=1.15.0
