@@ -40,9 +40,9 @@ class TestPictures(test_base.TestBase):
         id = response.get_json()['id']
         response = self.call_endpoint('/picture/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
+        del result['created']
         expected['id'] = id
-        del(expected['album_id'])
+        del expected['album_id']
         self.assertEqual(result, expected)
 
     def test_add_pictures_fetch_album(self):
@@ -83,11 +83,11 @@ class TestPictures(test_base.TestBase):
                                       'get')
         self.assertEqual(response.status_code, 200)
         result = response.get_json()
-        del(result['created'])
+        del result['created']
         result.pop('event_id', None)
         for pic in range(5):
             # ignore complicated imageSet values for this test
-            del(result['media'][pic]['imageSet'])
+            del result['media'][pic]['imageSet']
         expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
         self.assertEqual(result, dict(id=album_id, pictures=pic_ids,
                                       cover_id=pic_ids[0], **expected))
@@ -114,9 +114,9 @@ class TestPictures(test_base.TestBase):
                          response.get_json().get('message'))
         response = self.call_endpoint('/picture/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
-        del(result['modified'])
-        del(expected['album_id'])
+        del result['created']
+        del result['modified']
+        del expected['album_id']
         expected.update(updated)
         expected['id'] = id
         self.assertEqual(result, expected)
@@ -142,8 +142,8 @@ class TestPictures(test_base.TestBase):
         # The record should still exist, with disabled status
         response = self.call_endpoint('/picture/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
-        del(expected['album_id'])
+        del result['created']
+        del expected['album_id']
         expected['id'] = id
 
         self.assertEqual(result, expected)

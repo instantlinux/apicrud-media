@@ -42,8 +42,7 @@ class TestFileUpload(test_base.TestBase):
                     self.access_key_id, datetime.utcnow().strftime('%Y%m%d'),
                     constants.DEFAULT_AWS_REGION)
             },
-            upload_url='https://%s.s3.%s.amazonaws.com/' % (
-                self.bucket, constants.DEFAULT_AWS_REGION)
+            upload_url='https://%s.s3.amazonaws.com/' % (self.bucket)
         )
         response = self.call_endpoint('/file_upload_url', 'post', data=record)
         self.assertEqual(response.status_code, 201)
@@ -52,9 +51,9 @@ class TestFileUpload(test_base.TestBase):
                          self.test_uid)
         self.assertEqual(len(result['params'].pop('x-amz-signature')),
                          64)
-        del(result['file_id'])
-        del(result['params']['policy'])
-        del(result['params']['x-amz-date'])
+        del result['file_id']
+        del result['params']['policy']
+        del result['params']['x-amz-date']
         self.assertEqual(result, expected)
 
     @mock_s3
