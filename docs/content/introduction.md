@@ -8,4 +8,4 @@ The essential components of a modern full-stack application include a back-end A
 
 ## License
 
-Software copyright &copy; 2020 by Richard Braun &bull; [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+Software copyright &copy; 2022 by Richard Braun &bull; [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)

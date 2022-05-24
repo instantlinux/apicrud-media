@@ -1,6 +1,6 @@
 autodoc==0.5.0
-pymdown-extensions==8.1.1
-Sphinx==3.5.2
+pymdown-extensions==9.4
+Sphinx==4.5.0
 sphinxcontrib-mermaid==0.6.3
 sphinx-markdown-parser==0.2.4
 sphinx-markdown-tables==0.0.15
@@ -26,9 +26,9 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 unify==0.5
 untokenize==0.1.1
-waitress==1.4.4
+waitress==2.1.1
 WebOb==1.8.7
-WebTest==2.0.35
+WebTest==3.0.0
 yapf==0.30.0
 # already mentioned in ../requirements-dev.txt
 # attrs>=20.3.0

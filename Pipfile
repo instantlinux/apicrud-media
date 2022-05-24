@@ -1,5 +1,5 @@
 [packages]
-apicrud = "==0.2.7"
+apicrud = "==0.2.9"
 # TODO put this back when alpine 3.16 comes out
 # Pillow = "==9.0.0"
 
@@ -14,10 +14,16 @@ dollar-ref = "*"
 SQLAlchemy = "<1.4.0"
 SQLAlchemy-Utils = "*"
 swagger-ui-bundle = "*"
+# Held back due to
+# AttributeError: 'LocalStack' object has no attribute '__ident_func__'
+werkzeug = "==2.0.2"
+# Held back due to
+# AttributeError: module 'jinja2.ext' has no attribute 'autoescape'
+jinja2 = "==3.0.3"
 
 # Transitive dependencies pinned to versions of python-wsgi base image
 arrow = "==1.2.1"
-b2sdk = "==1.14.0"
+b2sdk = "==1.16.0"
 boto3 = "==1.18.49"
 botocore = "==1.21.49"
 cffi = "==1.14.5"
@@ -35,7 +41,7 @@ click-didyoumean = "==0.0.3"
 redis = "<4.1.0"
 
 [dev-packages]
-coverage = "==6.2"
+coverage = "==6.3.3"
 fakeredis = "*"
 flake8 = "4.0.1"
 moto = "*"
