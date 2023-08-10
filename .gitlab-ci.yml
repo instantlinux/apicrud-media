@@ -4,7 +4,7 @@
 
 variables:
   PLATFORMS: linux/amd64,linux/arm64
-  IMAGE: example-media
+  IMAGE: apicrud-media
   REGISTRY: $REGISTRY_URI/$CI_PROJECT_PATH
 
 stages:
