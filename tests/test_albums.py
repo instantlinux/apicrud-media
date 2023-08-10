@@ -29,7 +29,7 @@ class TestAlbums(test_base.TestBase):
         id = response.get_json()['id']
         response = self.call_endpoint('/album/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
+        del result['created']
         result.pop('event_id', None)
         expected['id'] = id
         expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])
@@ -55,8 +55,8 @@ class TestAlbums(test_base.TestBase):
                          response.get_json().get('message'))
         response = self.call_endpoint('/album/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
-        del(result['modified'])
+        del result['created']
+        del result['modified']
         result.pop('event_id', None)
         expected.update(updated)
         expected['id'] = id
@@ -100,7 +100,7 @@ class TestAlbums(test_base.TestBase):
         # The record should still exist, with disabled status
         response = self.call_endpoint('/album/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
+        del result['created']
         result.pop('event_id', None)
         expected['id'] = id
         expected['sizes'].append(self.config.DEFAULT_GRANTS['photo_res_max'])

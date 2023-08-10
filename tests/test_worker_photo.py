@@ -76,10 +76,10 @@ class TestWorkerPhoto(test_base.TestBase):
         result = response.get_json()
         self.assertEqual(result['thumbnail50x50'][:22],
                          'data:image/jpeg;base64')
-        del(result['created'])
+        del result['created']
         expected['id'] = id
-        del(expected['album_id'])
-        del(result['thumbnail50x50'])
+        del expected['album_id']
+        del result['thumbnail50x50']
         self.assertEqual(result, expected)
 
     @mock_s3
@@ -139,10 +139,10 @@ class TestWorkerPhoto(test_base.TestBase):
         result = response.get_json()
         self.assertEqual(result['thumbnail50x50'][:22],
                          'data:image/jpeg;base64')
-        del(result['created'])
+        del result['created']
         expected['id'] = id
-        del(expected['album_id'])
-        del(result['thumbnail50x50'])
+        del expected['album_id']
+        del result['thumbnail50x50']
         self.assertEqual(result, expected)
 
     @mock_s3
@@ -199,10 +199,10 @@ class TestWorkerPhoto(test_base.TestBase):
 
         response = self.call_endpoint('/picture/%s' % id, 'get')
         result = response.get_json()
-        del(result['created'])
+        del result['created']
         expected['id'] = id
-        del(expected['album_id'])
-        del(result['thumbnail50x50'])
+        del expected['album_id']
+        del result['thumbnail50x50']
         self.assertEqual(result, expected)
 
     """

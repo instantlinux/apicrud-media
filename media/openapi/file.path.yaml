@@ -214,6 +214,7 @@ upload_complete-id:
     - description: ID of new file
       in: path
       name: id
+      required: true
       schema:
         $ref: '#/components/schemas/base/properties/id'
     - description: status of upload

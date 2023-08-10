@@ -104,7 +104,9 @@ Picture:
     thumbnail50x50:
       format: binary
       readOnly: true
-      type: image/*
+      type: string
+      # TODO: not sure how to specify this; may be unnecessary
+      # type: image/*
     uid:
       $ref: '#/components/schemas/base/properties/id'
     upload_url:
